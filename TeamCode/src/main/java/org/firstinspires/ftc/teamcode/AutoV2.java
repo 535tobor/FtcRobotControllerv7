@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -27,12 +23,6 @@ public class AutoV2 extends HwMap {
     double currObjCloseUpHeight;
     double initDividend =0;
     double roboAngle = 0;
-//
-//    BNO055IMU imu;
-//    int rotations = 0;
-//    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//    double desiredHeading = 0.0;
-//    Orientation gyroAngles;
 
     //think about  what if the camera puts the box around half of the object or just not the entire object; max height is not accurate ^^
     //find threshold so the height is when the camera is centered on certain object and it is or almost is the height of the frame (closest to the object)
@@ -102,6 +92,7 @@ public class AutoV2 extends HwMap {
                         initDividend = currObjCloseUpHeight-height;
                         telemetry.addData("max object height ", currObjCloseUpHeight);
                         telemetry.addData("da dividend (max-currentHeight) ",initDividend);
+                        updateGyro();
 
 
                         //if()//assuming you start facing the barcode and ducks this conditional checks for a duck in robot's proximity(check for proximity like don't check if too far away from object)
@@ -189,18 +180,4 @@ public class AutoV2 extends HwMap {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
     }
-//    public double getIntegratedHeading() {
-//        if(desiredHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
-//            rotations++;
-//        }
-//        else if(desiredHeading - (rotations * 360 + gyroAngles.firstAngle) < -200) {
-//            rotations--;
-//        }
-//
-//        desiredHeading = rotations * 360 + gyroAngles.firstAngle;
-//        return desiredHeading;
-//
-//
-//    }
-
 }

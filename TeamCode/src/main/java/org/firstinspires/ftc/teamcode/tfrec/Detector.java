@@ -448,11 +448,11 @@ public class Detector implements ImageReader.OnImageAvailableListener, Camera.Pr
             classifier.close();
             classifier = null;
         }
-//        if (device == Device.GPU
-//                && (model == Model.QUANTIZED_MOBILENET || model == Model.QUANTIZED_EFFICIENTNET)) {
-//            Log.e(TAG, "recreateClassifier. Not creating classifier: GPU doesn't support quantized models.");
-//            return;
-//        }
+        if (device == Device.GPU
+                && (model == Model.QUANTIZED_MOBILENET || model == Model.QUANTIZED_EFFICIENTNET)) {
+            Log.e(TAG, "recreateClassifier. Not creating classifier: GPU doesn't support quantized models.");
+            return;
+        }
         try {
             classifier = Classifier.create((Activity)this.appContext, model, device, numThreads, this.getModelPath(), this.getLabelPath(), telemetry);
             Log.d(TAG, String.format("Created classifier (model=%s, device=%s, numThreads=%d)", model, device, numThreads));

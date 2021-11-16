@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "4WLDR")
 //@Disabled
 public class FourWLDriv extends HwMapIter{
@@ -25,7 +24,7 @@ public class FourWLDriv extends HwMapIter{
     {
         if(Math.abs(gamepad1.left_stick_y)>.1) {
             fl.setPower(-gamepad1.left_stick_y);
-            bl.setPower(-gamepad1.right_stick_y);
+            bl.setPower(-gamepad1.left_stick_y);
         }
         else {
             fl.setPower(0);

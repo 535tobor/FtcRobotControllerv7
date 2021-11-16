@@ -6,6 +6,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.tensorflow.lite.support.common.TensorOperator;
 import org.tensorflow.lite.support.common.ops.NormalizeOp;
 
+import java.io.IOException;
+
 public class ClassifierQuantizedEfficientNet extends Classifier {
     /**
      * The quantized model does not require normalization, thus set mean as 0.0f, and std as 1.0f to
