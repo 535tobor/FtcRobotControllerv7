@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @TeleOp(name = "4WLDR")
 //@Disabled
 public class FourWLDriv extends HwMapIter{
@@ -25,9 +23,15 @@ public class FourWLDriv extends HwMapIter{
     @Override
     public void loop()
     {
+        updateGyro();
         // controller one... driving
-        long ticCount = fl.getCurrentPosition();
-        telemetry.addData("Tic Count: ", ticCount);
+        long ticCountfl = fl.getCurrentPosition(), ticCountfr = fr.getCurrentPosition(), ticCountbr = br.getCurrentPosition(), ticCountbl = bl.getCurrentPosition();
+        telemetry.addData("Tic Count FL: ", ticCountfl);
+        telemetry.addData("Tic Count FR: ", ticCountfr);
+        telemetry.addData("Tic Count BL: ", ticCountbl);
+        telemetry.addData("Tic Count BR: ", ticCountbr);
+        telemetry.addData("robo angle: ", getIntegratedHeading());
+        telemetry.update();
         if(Math.abs(gamepad1.left_stick_y)>.1) {
             fl.setPower(-gamepad1.left_stick_y);
             bl.setPower(-gamepad1.left_stick_y);
@@ -126,4 +130,5 @@ public class FourWLDriv extends HwMapIter{
     public void stop()
     {
 
-    }}
+    }
+}

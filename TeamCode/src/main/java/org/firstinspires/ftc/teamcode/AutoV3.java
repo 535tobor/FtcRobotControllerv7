@@ -12,8 +12,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name = "Autov2")
-public class AutoV2 extends HwMap {
+@Autonomous(name = "Autov3")
+public class AutoV3 extends HwMap {
     String currObj = "";
     boolean isCloseUp = false, isObjectsDetected =true;
     double height, camAngle, speed;
@@ -23,6 +23,7 @@ public class AutoV2 extends HwMap {
     double currObjCloseUpHeight;
     double initDividend =0;
     double roboAngle = 0;
+    int caseNum = 0;
 
     //think about  what if the camera puts the box around half of the object or just not the entire object; max height is not accurate ^^
     //find threshold so the height is when the camera is centered on certain object and it is or almost is the height of the frame (closest to the object)
@@ -99,7 +100,11 @@ public class AutoV2 extends HwMap {
                     }
                     telemetry.update();
                     //gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                    switch(caseNum)
+                    {
+                        case 0:
 
+                    }
 
                 }
 

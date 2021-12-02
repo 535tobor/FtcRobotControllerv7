@@ -20,13 +20,18 @@ public class HwMap extends LinearOpMode {
         fr = hardwareMap.dcMotor.get("fr");
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
-        fr.setDirection(DcMotor.Direction.REVERSE);
-        br.setDirection(DcMotor.Direction.REVERSE);
+        fl.setDirection(DcMotor.Direction.REVERSE);
+        bl.setDirection(DcMotor.Direction.REVERSE);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        //bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
     @Override
     public void runOpMode()  {
@@ -36,7 +41,7 @@ public class HwMap extends LinearOpMode {
     {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
-    private double getIntegratedHeading() {
+    public double getIntegratedHeading() {
         if(desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
             rotations++;
         }
