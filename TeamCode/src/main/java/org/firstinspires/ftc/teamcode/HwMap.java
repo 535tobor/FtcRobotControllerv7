@@ -115,6 +115,7 @@ public class HwMap extends LinearOpMode {
         }
         setPowerAll(0);
     }
+
     public void encoderDrive(double motorPower, int inches, int timeoutS)
     {
         int newFLTarget;

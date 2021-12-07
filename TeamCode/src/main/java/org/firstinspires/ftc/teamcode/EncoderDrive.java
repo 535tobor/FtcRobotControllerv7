@@ -22,9 +22,9 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            encoderDrive(.6, 10, 5);
+            encoderDri(.6, .6, 10, 5, );
             turn(carouselDeg);
-            encoderDrive(.6, 20, 5);
+            encoderDri(.6, 20, 5);
 
             //pivot
             //90degree turn
@@ -70,9 +70,9 @@ public class EncoderDrive extends HwMap {
                 NRspeed = Rspeed;
             }
             //start slowing down as you get close to the target
-            else if(rem > (200) && (Lspeed*.2) > .1 && (Rspeed*.2) > .1) {
-                NLspeed = Lspeed * (rem / 1000);
-                NRspeed = Rspeed * (rem / 1000);
+            else if(rem > (400) && (Lspeed*.2) > .1 && (Rspeed*.2) > .1) {
+                NLspeed = Lspeed * (rem / 2000);
+                NRspeed = Rspeed * (rem / 2000);
             }
             //minimum speed
             else {
