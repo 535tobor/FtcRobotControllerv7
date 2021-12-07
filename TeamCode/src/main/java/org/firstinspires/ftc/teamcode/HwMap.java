@@ -47,7 +47,7 @@ public class HwMap extends LinearOpMode {
     {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
-    public double getIntegratedHeading() {
+    public double robotAngle() {
         if(desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
             rotations++;
         }
@@ -93,9 +93,9 @@ public class HwMap extends LinearOpMode {
     }
     public void turn(int degrees) //from current
     {
-        double initAngle = getIntegratedHeading();
+        double initAngle = robotAngle();
         double desiredAngle = initAngle + degrees;
-        while(opModeIsActive()&&(getIntegratedHeading()>( desiredAngle + 3)||getIntegratedHeading()<(desiredAngle- 3)))
+        while(opModeIsActive()&&(robotAngle()>( desiredAngle + 3)||robotAngle()<(desiredAngle- 3)))
         {//left is pos
             updateGyro();
             if(degrees>0)
