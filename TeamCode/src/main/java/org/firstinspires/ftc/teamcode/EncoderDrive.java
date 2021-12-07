@@ -22,9 +22,9 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            encoderDri(.6, .6, 10, 5, );
-            turn(carouselDeg);
-            encoderDri(.6, 20, 5);
+            encoderDri(.6, .6, 10, 5, 2);
+            //turn(carouselDeg);
+            //encoderDri(.6, .6, 10, 5, 2);
 
             //pivot
             //90degree turn
@@ -36,23 +36,23 @@ public class EncoderDrive extends HwMap {
 
 
     }
-    public void encoderDri(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup) throws InterruptedException {
+    public void encoderDri(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
         int newLeftTarget, newRightTarget, currLeftAvg, currRightAvg;
         // Ensure that the opmode is still active
         // Determine new target position, and pass to motor controller we only do this in case the encoders are not totally zero'd
-        currLeftAvg = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2;
-        currRightAvg = (fr.getCurrentPosition() + br.getCurrentPosition() )/2;
-        newLeftTarget =  currLeftAvg + (int)(Inches * COUNTS_PER_INCH);
-        newRightTarget =  currRightAvg + (int)(Inches * COUNTS_PER_INCH);
+        currLeftAvg = (fl.getCurrentPosition() + bl.getCurrentPosition()) / 2;
+        currRightAvg = (fr.getCurrentPosition() + br.getCurrentPosition()) / 2;
+        newLeftTarget = currLeftAvg + (int) (Inches * COUNTS_PER_INCH);
+        newRightTarget = currRightAvg + (int) (Inches * COUNTS_PER_INCH);
         // reset the timeout time and start motion.
         runtime.reset();
         // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-        while ( (runtime.seconds() < timeoutS) &&
-                (Math.abs(currLeftAvg)< newLeftTarget  &&
+        while ((runtime.seconds() < timeoutS) &&
+                (Math.abs(currLeftAvg) < newLeftTarget &&
                         Math.abs(currRightAvg) < newRightTarget)) {
-            currLeftAvg = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2;
-            currRightAvg = (fr.getCurrentPosition() + br.getCurrentPosition() )/2;
-            double rem = (Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
+            currLeftAvg = (fl.getCurrentPosition() + bl.getCurrentPosition()) / 2;
+            currRightAvg = (fr.getCurrentPosition() + br.getCurrentPosition()) / 2;
+            double rem = (Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition())) / 4;
             double NLspeed;
             double NRspeed;
             //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over
@@ -64,13 +64,12 @@ public class EncoderDrive extends HwMap {
                 NRspeed = Rspeed * ramp;
             }
 //Keep running until you are about two rotations out
-            else if(rem > (2240) )
-            {
+            else if (rem > (2240)) {
                 NLspeed = Lspeed;
                 NRspeed = Rspeed;
             }
             //start slowing down as you get close to the target
-            else if(rem > (400) && (Lspeed*.2) > .1 && (Rspeed*.2) > .1) {
+            else if (rem > (400) && (Lspeed * .2) > .1 && (Rspeed * .2) > .1) {
                 NLspeed = Lspeed * (rem / 2000);
                 NRspeed = Rspeed * (rem / 2000);
             }
@@ -90,16 +89,16 @@ public class EncoderDrive extends HwMap {
         //Note: This is outside our while statement, this will only activate once the time, or distance has been met
         setPowerZero();
         // show the driver how close they got to the last target
-        telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-        telemetry.addData("Path2",  "Running at %7d :%7d", fl.getCurrentPosition(), fr.getCurrentPosition());
+        telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
+        telemetry.addData("Path2", "Running at %7d :%7d", fl.getCurrentPosition(), fr.getCurrentPosition());
         telemetry.update();
         //setting resetC as a way to check the current encoder values easily
-        double resetC = ((Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+ Math.abs(fr.getCurrentPosition())+Math.abs(fr.getCurrentPosition())));
+        double resetC = ((Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition()) + Math.abs(fr.getCurrentPosition())));
         //Get the motor encoder resets in motion
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //keep waiting while the reset is running
-        while (Math.abs(resetC) > 0){
-            resetC =  ((Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+ Math.abs(fr.getCurrentPosition())+Math.abs(fr.getCurrentPosition())));
+        while (Math.abs(resetC) > 0) {
+            resetC = ((Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition()) + Math.abs(fr.getCurrentPosition())));
             idle();
         }
         // switch the motors back to RUN_USING_ENCODER mode
