@@ -47,7 +47,7 @@ public class EncoderDrive extends HwMap {
         // reset the timeout time and start motion.
         runtime.reset();
         // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-        while ((runtime.seconds() < timeoutS) &&
+        while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
                 (Math.abs(currLeftAvg) < newLeftTarget &&
                         Math.abs(currRightAvg) < newRightTarget)) {
             currLeftAvg = (fl.getCurrentPosition() + bl.getCurrentPosition()) / 2;
