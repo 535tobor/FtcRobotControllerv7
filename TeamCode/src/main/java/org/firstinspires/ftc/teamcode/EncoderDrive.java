@@ -12,7 +12,7 @@ public class EncoderDrive extends HwMap {
     @Override
     public void runOpMode(){
         initHwMap();
-        setModeAll(DcMotor.RunMode.RUN_USING_ENCODER);
+        //setModeAll(DcMotor.RunMode.RUN_USING_ENCODER);
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         while(!isStarted()&&!isStopRequested()) //init not run
         {
@@ -22,7 +22,7 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            encoderDri(.6, .6, 10, 5, 2);
+            encoderDri(.6, .6, 10, 10, 2);
             //turn(carouselDeg);
             //encoderDri(.6, .6, 10, 5, 2);
 
