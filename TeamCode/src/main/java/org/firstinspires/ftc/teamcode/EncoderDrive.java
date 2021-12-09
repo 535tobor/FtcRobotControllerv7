@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @Autonomous(name="Encoder")
 
 public class EncoderDrive extends HwMap {
@@ -22,6 +24,8 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
+            telemetry.addData("Hello: ", "world");
+            telemetry.update();
             encoderDri(.6, .6, 10, 10, 2);
             //turn(carouselDeg);
             //encoderDri(.6, .6, 10, 5, 2);
