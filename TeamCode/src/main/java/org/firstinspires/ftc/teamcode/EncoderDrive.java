@@ -7,13 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class EncoderDrive extends HwMap {
     int encoderCountsToCarousel;
-    int carouselDeg = 110;
+    int carouselDeg = -45;
 
     @Override
     public void runOpMode(){
         initHwMap();
         //setModeAll(DcMotor.RunMode.RUN_USING_ENCODER);
-        setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         while(!isStarted()&&!isStopRequested()) //init not run
         {
             updateGyro();
@@ -22,13 +22,9 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            try {
-                encoderDriv(.8, .8, 10, 10, 2);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            //turn(carouselDeg);
-            //encoderDri(.6, .6, 10, 5, 2);
+            encoderDriv(.8, .8, 10, 5, 1);// move forward
+            turn(carouselDeg);
+            encoderDriv(-.8, -.8, 10, 5, 1);// backward towards carousel
 
             //pivot
             //90degree turn
@@ -40,7 +36,7 @@ public class EncoderDrive extends HwMap {
 
 
     }
-    public void encoderDriv(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup) throws InterruptedException {
+    public void encoderDriv(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
         int newLeftTarget;
         int newRightTarget;
         // Ensure that the opmode is still active
@@ -93,29 +89,6 @@ public class EncoderDrive extends HwMap {
         fr.setPower(0);
         bl.setPower(0);
         br.setPower(0);
-        // show the driver how close they got to the last target
-        telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-        telemetry.addData("Path2",  "Running at %7d :%7d", fl.getCurrentPosition(), fr.getCurrentPosition());
-        telemetry.update();
-        //setting resetC as a way to check the current encoder values easily
-        double resetC = ((Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+ Math.abs(fr.getCurrentPosition())+Math.abs(fr.getCurrentPosition())));
-        //Get the motor encoder resets in motion
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //keep waiting while the reset is running
-        while (Math.abs(resetC) > 0){
-            resetC =  ((Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+ Math.abs(fr.getCurrentPosition())+Math.abs(fr.getCurrentPosition())));
-            idle();
-        }
-        // switch the motors back to RUN_USING_ENCODER mode
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//give the encoders a chance to switch modes.
-        //  sleep(250);   // optional pause after each move
     }
 
     public void encoderDri(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
@@ -184,6 +157,7 @@ public class EncoderDrive extends HwMap {
             idle();
         }
         // switch the motors back to RUN_USING_ENCODER mode
+        //wai
         setModeAll(DcMotor.RunMode.RUN_USING_ENCODER);
         //give the encoders a chance to switch modes.
         //  sleep(250);   // optional pause after each move
