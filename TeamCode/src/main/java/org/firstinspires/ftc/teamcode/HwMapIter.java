@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -17,6 +19,7 @@ public class HwMapIter extends OpMode {
     }
     public DcMotor fl, fr, br, bl;
     public Servo servo;
+    public CRServo carouSpin;
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
@@ -26,6 +29,7 @@ public class HwMapIter extends OpMode {
         fr = hardwareMap.dcMotor.get("fr");
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
+        carouSpin = hardwareMap.crservo.get("carouSpin");
         //test bot reverse statements
         //fr.setDirection(DcMotor.Direction.REVERSE);
         //br.setDirection(DcMotor.Direction.REVERSE);

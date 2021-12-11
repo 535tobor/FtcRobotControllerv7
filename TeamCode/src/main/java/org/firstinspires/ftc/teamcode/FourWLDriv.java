@@ -44,14 +44,19 @@ public class FourWLDriv extends HwMapIter{
             fr.setPower(0);
             br.setPower(0);
         }
-        /**
-        //I just set up everything below this to see how it worked, if it shouldn't be here just delete it
-        if(gamepad1.a) {
-            servo.setPosition(0.5); //just remembering how to code, this isn't actually gonna be used probably
-        }
-        if(gamepad1.b) {
 
+
+
+        if(gamepad1.a) {
+            carouSpin.setPower(1);
         }
+        else if(gamepad1.b) {
+            carouSpin.setPower(-1);
+        }
+        else{
+            carouSpin.setPower(0);
+        }
+        /**
         if(gamepad1.x) {
 
         }
