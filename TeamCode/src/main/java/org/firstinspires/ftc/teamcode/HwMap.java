@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -47,37 +46,20 @@ public class HwMap extends LinearOpMode {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
     public double robotAngle() {
-        if(desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
+        if (desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
             rotations++;
-        }
-        else if(desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) < -200) {
+        } else if (desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) < -200) {
             rotations--;
         }
 
         return (rotations * 360 + gyroAngles.firstAngle);
     }
-
-    public void setRTPAll()
-    {
-        fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
     public void setModeAll(DcMotor.RunMode mode)
     {
         fl.setMode(mode);
         fr.setMode(mode);
         bl.setMode(mode);
         br.setMode(mode);
-    }
-    public void setTargetPositionAll(int flEncoderCts, int frEncoderCts, int blEncoderCts, int brEncoderCts) //JUST FOR ONE MOTOR AT A TIME IF LINEAR
-    {
-        fl.setTargetPosition(flEncoderCts);
-        fr.setTargetPosition(frEncoderCts);
-        bl.setTargetPosition(blEncoderCts);
-        br.setTargetPosition(brEncoderCts);
     }
     public void setPowerAll(double power)
     {
@@ -114,44 +96,60 @@ public class HwMap extends LinearOpMode {
         }
         setPowerAll(0);
     }
-
-    public void encoderDrive(double motorPower, int inches, int timeoutS)
-    {
-        int newFLTarget;
-        int newFRTarget;
-        int newBLTarget;
-        int newBRTarget;
-
-        if (opModeIsActive()) {
-
-            newFLTarget = fl.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-            newFRTarget = fr.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-            newBLTarget = bl.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-            newBRTarget = br.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-
-            setTargetPositionAll(newFLTarget, newFRTarget, newBLTarget, newBRTarget); //set target position
-
-            setRTPAll(); //set run to position for all motors
-
-            runtime.reset();
-            setPowerAll(motorPower);
-
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (fl.isBusy() || fr.isBusy() || bl.isBusy() || br.isBusy())) {
-
-                telemetry.addData("Path1",  "Running to %7d :%7d", newFLTarget,  newFRTarget);
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        fl.getCurrentPosition(),
-                        fr.getCurrentPosition(),
-                        bl.getCurrentPosition());
-                telemetry.update();
+    public void encoderDrive(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
+        int newLeftTarget = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
+        int newRightTarget= (fr.getCurrentPosition() + br.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
+        // Ensure that the opmode is still active
+        // Determine new target position, and pass to motor controller we only do this in case the encoders are not totally zero'd
+        // reset the timeout time and start motion.
+        runtime.reset();
+        // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
+        while ( opModeIsActive() && (runtime.seconds() < timeoutS) &&
+                (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&
+                        Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget)) {
+            double rem = (Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
+            double NLspeed;
+            double NRspeed;
+            boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&
+                    Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
+            boolean why = (runtime.seconds() < timeoutS);
+            telemetry.addData("time bool: "+why+ " cur Pos bool: ",tele);
+            telemetry.update();
+            //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over
+            //the amount of time you set for this SubRun
+            double R = runtime.seconds();
+            if (R < rampup) {
+                double ramp = R / rampup;
+                NLspeed = Lspeed * ramp;
+                NRspeed = Rspeed * ramp;
             }
+//Keep running until you are about two rotations out
+            else if(rem > (2000) )
+            {
+                NLspeed = Lspeed;
+                NRspeed = Rspeed;
+            }
+            //start slowing down as you get close to the target
+            else if(rem > (400) && (Lspeed*.2) > .1 && (Rspeed*.2) > .1) {
+                NLspeed = Lspeed * (rem / 2000);
+                NRspeed = Rspeed * (rem / 2000);
+            }
+            //minimum speed
+            else {
+                NLspeed = Lspeed * .2;
+                NRspeed = Rspeed * .2;
 
-            setPowerZero();
-
-            setModeAll(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            //Pass the seed values to the motors
+            fl.setPower(NLspeed);
+            bl.setPower(NLspeed);
+            fr.setPower(NRspeed);
+            br.setPower(NRspeed);
         }
+        // Stop all motion;
+        fl.setPower(0);
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
     }
-
 }

@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @TeleOp(name = "4WLDR")
-//@Disabled
+
 public class FourWLDriv extends HwMapIter{
+    boolean armUpRangeIsValid, armDownRangeIsValid;
+    int downRange, upRange;
+    double pincerOpen, pincerClosed;
     @Override
     public void init()
     {
@@ -26,8 +27,7 @@ public class FourWLDriv extends HwMapIter{
     public void loop()
     {
         // controller one... driving
-        long ticCount = fl.getCurrentPosition();
-        telemetry.addData("Tic Count: ", ticCount);
+
         if(Math.abs(gamepad1.left_stick_y)>.1) {
             fl.setPower(-gamepad1.left_stick_y);
             bl.setPower(-gamepad1.left_stick_y);
@@ -45,90 +45,45 @@ public class FourWLDriv extends HwMapIter{
             br.setPower(0);
         }
 
+        //  controller two... arm/claw/carouspinner
 
-
-        if(gamepad1.a) {
+        if(gamepad2.left_bumper) {
             carouSpin.setPower(1);
         }
-        else if(gamepad1.b) {
+        else if(gamepad2.right_bumper) {
             carouSpin.setPower(-1);
         }
         else{
             carouSpin.setPower(0);
         }
-        /**
-        if(gamepad1.x) {
 
+        armUpRangeIsValid = arm.getCurrentPosition()<upRange;//change value
+        armDownRangeIsValid = arm.getCurrentPosition()>downRange;
+        if(gamepad2.left_stick_y<0&&armDownRangeIsValid)
+        {
+            arm.setPower(-.5);
         }
-        if(gamepad1.y) {
-
+        else if(gamepad2.left_stick_y>0&&armUpRangeIsValid)
+        {
+            arm.setPower(.5);
         }
-        if(gamepad1.dpad_up) {
-
-        }
-        if(gamepad1.dpad_down) {
-
-        }
-        if(gamepad1.dpad_left) {
-
-        }
-        if(gamepad1.dpad_right) {
-
-        }
-        if(gamepad1.left_bumper) {
-
-        }
-        if(gamepad1.right_bumper) {
-
-        }
-        // controller two...
-        if(Math.abs(gamepad2.left_stick_y)>.1) {
-
-        }
-        else {
-
-        }
-        if(Math.abs(gamepad2.right_stick_y)>.1) {
-
-        }
-        else {
-
+        else{
+            arm.setPower(0);
         }
 
-        if(gamepad2.a) {
-
+        if(gamepad2.a)
+        {
+            pincer.setPosition(pincerOpen);
         }
-        if(gamepad2.b) {
-
+        else if(gamepad2.b)
+        {
+            pincer.setPosition(pincerClosed);
         }
-        if(gamepad2.x) {
 
-        }
-        if(gamepad2.y) {
-
-        }
-        if(gamepad2.dpad_up) {
-
-        }
-        if(gamepad2.dpad_down) {
-
-        }
-        if(gamepad2.dpad_left) {
-
-        }
-        if(gamepad2.dpad_right) {
-
-        }
-        if(gamepad2.left_bumper) {
-
-        }
-        if(gamepad2.right_bumper) {
-
-        }
-         **/
     }
     @Override
     public void stop()
     {
 
-    }}
+    }
+}
