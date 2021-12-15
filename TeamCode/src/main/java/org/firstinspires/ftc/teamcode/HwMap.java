@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class HwMap extends LinearOpMode {
+
     public DcMotor fl, fr, br, bl;
     public CRServo carouSpin;
     public int rotations = 0;
@@ -78,6 +79,18 @@ public class HwMap extends LinearOpMode {
     public void setPowerZero()
     {
         setPowerAll(0);
+    }
+    public void moveByTime(double speed, double time){
+        while (runtime.time() > time ){
+            setPowerAll(speed);
+        }
+        setPowerZero();
+    }
+    public void spin(double time){
+        while (runtime.time() < time){
+            carouSpin.setPower(1);
+        }
+        carouSpin.setPower(0);
     }
     public void turn(int degrees) //from current
     {

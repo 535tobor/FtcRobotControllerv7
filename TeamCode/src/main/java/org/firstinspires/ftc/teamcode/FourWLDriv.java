@@ -47,10 +47,10 @@ public class FourWLDriv extends HwMapIter{
 
         //  controller two... arm/claw/carouspinner
 
-        if(gamepad2.left_bumper) {
+        if(gamepad1.left_bumper) {
             carouSpin.setPower(1);
         }
-        else if(gamepad2.right_bumper) {
+        else if(gamepad1.right_bumper) {
             carouSpin.setPower(-1);
         }
         else{
