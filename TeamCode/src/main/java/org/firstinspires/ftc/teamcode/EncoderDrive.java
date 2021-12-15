@@ -11,6 +11,13 @@ public class EncoderDrive extends HwMap {
     boolean selectionButtonPressed = false, buttonPressed = false, boxOnHub = false, isSpinCarousel=false, collectElems = false, currBool = false;
     int caseNum = 0, startingDelay = 0;
     String startPos = "", promptStr = "", color = "";
+    //Roman Sux
+    //Roman Sux
+    //Roman Sux
+    //Roman Sux
+    //Roman Sux
+
+
 
     @Override
     public void runOpMode(){
