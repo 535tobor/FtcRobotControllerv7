@@ -27,8 +27,8 @@ public class FourWLDriv extends HwMapIter{
     public void loop()
     {
         // controller one... driving
-
-        if(Math.abs(gamepad1.left_stick_y)>.1) {
+        if(Math.abs(gamepad1.left_stick_y)>.1)
+        {
             fl.setPower(-gamepad1.left_stick_y);
             bl.setPower(-gamepad1.left_stick_y);
         }

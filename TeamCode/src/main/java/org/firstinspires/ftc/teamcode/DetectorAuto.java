@@ -18,8 +18,8 @@ public class DetectorAuto extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime time = new ElapsedTime();
 
-    private static String MODEL_FILE_NAME = "leftredbarcode.tflite";
-    private static String LABEL_FILE_NAME = "labels.txt";
+    private static String MODEL_FILE_NAME = "custom.tflite";
+    private static String LABEL_FILE_NAME = "custom_labels.txt";
     private static Classifier.Model MODEl_TYPE = Classifier.Model.FLOAT_EFFICIENTNET;
 
     @Override
