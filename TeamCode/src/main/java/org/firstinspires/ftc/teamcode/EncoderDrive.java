@@ -10,7 +10,7 @@ public class EncoderDrive extends HwMap {
     int carouselDeg = -45;
     boolean selectionButtonPressed = false, buttonPressed = false, boxOnHub = false, isSpinCarousel=false, collectElems = false, currBool = false;
     int caseNum = 0, startingDelay = 0;
-    String startPos = "", promptStr = "";
+    String startPos = "", promptStr = "", color = "";
 
     @Override
     public void runOpMode(){
@@ -33,7 +33,7 @@ public class EncoderDrive extends HwMap {
             }
             switch(caseNum){
                 case 0://first case, starting position because there are different movements we will do
-                    if(gamepad1.b) {startPos = "Rt"; promptStr = "Do you want to collect?";}//starting position will be on the right
+                    if(gamepad1.b) {startPos = "Rt";}//starting position will be on the right
                     if(gamepad1.x) {startPos = "Lt"; promptStr = "Do you want to spin the carousel? ";}//starting position will be on the left (only label not assigning values yet)
 
                     //left is closer to carousel and we will likely always go for the carousel spinner
@@ -43,11 +43,11 @@ public class EncoderDrive extends HwMap {
                     break;
 
                 case 1:  // place preloaded box on hub? selection
-                    if(gamepad1.b) {boxOnHub = true;}
-                    if(gamepad1.x) {boxOnHub = false;}
+                    if(gamepad1.b) {color = "red";}
+                    if(gamepad1.x) {color = "blue";}
 
-                    telemetry.addData("> Set box on hub ", "Current Value: " + boxOnHub );
-                    telemetry.addData("B Button = Yes", "X Button = No");
+                    telemetry.addData("> Set starting color ", "Current Value: " + color );
+                    telemetry.addData("B Button = red", "X Button = blue");
                     break;
 
                 case 2: // carousel spin(if start left), collect more elements(if right)
