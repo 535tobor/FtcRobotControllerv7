@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class EncoderDrive extends HwMap {
     int encoderCountsToCarousel;
-    int carouselDeg = -45;
+    int carouselDeg = -45, parkDeg = 90;
     boolean selectionButtonPressed = false, buttonPressed = false, boxOnHub = false, isSpinCarousel=false, collectElems = false, currBool = false;
     int caseNum = 0, startingDelay = 0;
     String startPos = "", promptStr = "", color = "";
@@ -100,6 +100,10 @@ public class EncoderDrive extends HwMap {
                 {
                     carousel(carouselDeg);
                 }
+                else if(startPos.equals("Rt"))
+                {
+                    warehousePark(parkDeg);
+                }
             }
             else if(color.equals("blue"))
             {
@@ -107,16 +111,32 @@ public class EncoderDrive extends HwMap {
                 {
                     carousel(-carouselDeg);
                 }
+                else if(startPos.equals("Lt"))
+                {
+                    warehousePark(-parkDeg);
+                }
             }
         }
     }
+    public void warehousePark(int degrees)
+    {
+        encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
+        turn(degrees);// turn towards the warehouse
+        sleep(250);
+        encoderDrive(.8, .8, 16, 7, 1);// drive into warehouse
+    }
+
     public void carousel(int degrees)
     {
         encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
         turn(degrees);// turn towards the right so the back of the bot carou spinner is facing the carousel
         sleep(250);
         encoderDrive(-.8, -.8, 7, 7, 1);// backward towards carousel
-        spin(5);
+        spin(5); //spin the carousel
+        //park
+        encoderDrive(.8, .8, 10, 5, 1);
+
+
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }
