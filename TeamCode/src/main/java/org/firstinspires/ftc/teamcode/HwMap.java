@@ -41,6 +41,13 @@ public class HwMap extends LinearOpMode {
     public void runOpMode()  {
 
     }
+    public void spin(double length)
+    {
+        while (runtime.time() < length){
+            carouSpin.setPower(1);
+        }
+        carouSpin.setPower(0);
+    }
     public void updateGyro()
     {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);

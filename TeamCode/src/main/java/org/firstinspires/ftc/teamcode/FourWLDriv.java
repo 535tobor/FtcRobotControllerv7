@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class FourWLDriv extends HwMapIter{
     boolean armUpRangeIsValid, armDownRangeIsValid;
     int downRange, upRange;
-    double pincerOpen, pincerClosed;
+    double pincerOpen = 0, pincerClosed = .9;
     @Override
     public void init()
     {
@@ -79,6 +79,7 @@ public class FourWLDriv extends HwMapIter{
         {
             pincer.setPosition(pincerClosed);
         }
+        telemetry.addData("current servo position: ", pincer.getPosition());
 
     }
     @Override

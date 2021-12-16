@@ -11,16 +11,12 @@ public class EncoderDrive extends HwMap {
     boolean selectionButtonPressed = false, buttonPressed = false, boxOnHub = false, isSpinCarousel=false, collectElems = false, currBool = false;
     int caseNum = 0, startingDelay = 0;
     String startPos = "", promptStr = "", color = "";
-    //Roman Sux
-    //Roman Sux
-    //Roman Sux
-    //Roman Sux
-    //Roman Sux
 
 
 
     @Override
-    public void runOpMode(){
+    public void runOpMode()
+    {
         initHwMap();
         setModeAll(DcMotor.RunMode.RUN_WITHOUT_ENCODER); //changed, should work???
         while(!isStarted()&&!isStopRequested()) //init not run
@@ -39,7 +35,15 @@ public class EncoderDrive extends HwMap {
                 selectionButtonPressed=!selectionButtonPressed;
             }
             switch(caseNum){
-                case 0://first case, starting position because there are different movements we will do
+                case 0:  //
+                    if(gamepad1.b) {color = "red";}
+                    if(gamepad1.x) {color = "blue";}
+
+                    telemetry.addData("> Set starting color ", "Current Value: " + color );
+                    telemetry.addData("B Button = red", "X Button = blue");
+                    break;
+
+                case 1://first case, starting position because there are different movements we will do
                     if(gamepad1.b) {startPos = "Rt";}//starting position will be on the right
                     if(gamepad1.x) {startPos = "Lt"; promptStr = "Do you want to spin the carousel? ";}//starting position will be on the left (only label not assigning values yet)
 
@@ -47,14 +51,6 @@ public class EncoderDrive extends HwMap {
                     //right is likely more collection and placement
                     telemetry.addData("> Set Start Position", "Current Value: " + startPos);
                     telemetry.addData("B Button = Right", "X Button = Lt");
-                    break;
-
-                case 1:  // place preloaded box on hub? selection
-                    if(gamepad1.b) {color = "red";}
-                    if(gamepad1.x) {color = "blue";}
-
-                    telemetry.addData("> Set starting color ", "Current Value: " + color );
-                    telemetry.addData("B Button = red", "X Button = blue");
                     break;
 
                 case 2: // carousel spin(if start left), collect more elements(if right)
@@ -98,12 +94,29 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
-            turn(carouselDeg);// turn towards the right so the back of the bot carou spinner is facing the carousel
-            sleep(250);
-            encoderDrive(-.8, -.8, 7, 7, 1);// backward towards carousel
-            setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+            if(color.equals("red"))
+            {
+                if(startPos.equals("Lt"))
+                {
+                    carousel(carouselDeg);
+                }
+            }
+            else if(color.equals("blue"))
+            {
+                if(startPos.equals("Rt"))
+                {
+                    carousel(-carouselDeg);
+                }
+            }
         }
+    }
+    public void carousel(int degrees)
+    {
+        encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
+        turn(degrees);// turn towards the right so the back of the bot carou spinner is facing the carousel
+        sleep(250);
+        encoderDrive(-.8, -.8, 7, 7, 1);// backward towards carousel
+        spin(5);
+        setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }
