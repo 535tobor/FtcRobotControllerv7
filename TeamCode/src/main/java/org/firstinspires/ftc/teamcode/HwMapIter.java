@@ -17,7 +17,7 @@ public class HwMapIter extends OpMode {
     public void init() {
 
     }
-    public DcMotor fl, fr, br, bl, arm;
+    public DcMotor fl, fr, br, bl, arm, extend;
     public Servo pincer;
     public CRServo carouSpin;
     public int rotations = 0;
