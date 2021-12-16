@@ -19,7 +19,7 @@ public class HwMapIter extends OpMode {
     }
     public DcMotor fl, fr, br, bl, arm, extend;
     public Servo pincer;
-    public CRServo carouSpin;
+    public CRServo carouSpin, pincer1;
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
@@ -31,6 +31,7 @@ public class HwMapIter extends OpMode {
         br = hardwareMap.dcMotor.get("br");
         carouSpin = hardwareMap.crservo.get("carouSpin");
         pincer = hardwareMap.servo.get("pincer");
+        pincer1 = hardwareMap.crservo.get("pincer1");
         arm = hardwareMap.dcMotor.get("arm");
         extend = hardwareMap.dcMotor.get("extend");
         //test bot reverse statements

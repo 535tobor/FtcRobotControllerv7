@@ -42,9 +42,9 @@ public class HwMap extends LinearOpMode {
     public void runOpMode()  {
 
     }
-    public void spin(double length)
+    public void spin(double time)
     {
-        while (runtime.time() < length){
+        while (runtime.time() < time){
             carouSpin.setPower(1);
         }
         carouSpin.setPower(0);
@@ -86,12 +86,7 @@ public class HwMap extends LinearOpMode {
         }
         setPowerZero();
     }
-    public void spin(double time){
-        while (runtime.time() < time){
-            carouSpin.setPower(1);
-        }
-        carouSpin.setPower(0);
-    }
+
     public void turn(int degrees) //from current
     {
         double initAngle = robotAngle();
