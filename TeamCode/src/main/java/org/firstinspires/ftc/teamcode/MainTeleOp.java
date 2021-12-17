@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "4WLDR")
+@TeleOp(name = "MainTele")
 
-public class FourWLDriv extends HwMapIter{
+public class MainTeleOp extends HwMapIter{
     boolean armUpRangeIsValid, armDownRangeIsValid, buttonPressed=false;
     int downRange, upRange;
     double newPincerPos;
