@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class EncoderDrive extends HwMap {
     int encoderCountsToCarousel;
-    int carouselDeg = -45, parkDeg = 90;
+    int carouselDeg = -45, parkDeg = -90;
     boolean selectionButtonPressed = false, buttonPressed = false, boxOnHub = false, isSpinCarousel=false, collectElems = false, currBool = false;
     int caseNum = 0, startingDelay = 0;
     String startPos = "", promptStr = "", color = "";
@@ -118,6 +118,10 @@ public class EncoderDrive extends HwMap {
             }
         }
     }
+//    public void deliverCargo()
+//    {
+//
+//    }
     public void warehousePark(int degrees)
     {
         encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall

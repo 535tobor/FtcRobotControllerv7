@@ -5,13 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name = "4WLDR")
 
 public class FourWLDriv extends HwMapIter{
-    boolean armUpRangeIsValid, armDownRangeIsValid;
+    boolean armUpRangeIsValid, armDownRangeIsValid, buttonPressed=false;
     int downRange, upRange;
-    double pincerOpen = 0, pincerClosed = 1;
+    double newPincerPos;
     @Override
     public void init()
     {
-        initHwMap();
+        initHwMap(); newPincerPos = pincer.getPosition();
     }
     @Override
     public void init_loop()
@@ -61,36 +61,41 @@ public class FourWLDriv extends HwMapIter{
         //armDownRangeIsValid = arm.getCurrentPosition()>downRange;
         if(gamepad2.left_stick_y<0)//&&armDownRangeIsValid)
         {
-            arm.setPower(-1);
+            extend.setPower(-1);
         }
         else if(gamepad2.left_stick_y>0)//&&armUpRangeIsValid)
         {
-            arm.setPower(1);
-        }
-        else{
-            arm.setPower(0);
-        }
-
-        if(gamepad2.right_stick_y<0)
-        {
-            extend.setPower(-.2);
-        }
-        else if(gamepad2.right_stick_y>0)
-        {
-            extend.setPower(.2);
+            extend.setPower(1);
         }
         else{
             extend.setPower(0);
         }
 
-        if(gamepad2.a)
+        if(gamepad2.right_stick_y<0)
         {
-            pincer.setPosition(pincerOpen);
+            arm.setPower(-.2);
         }
-        else if(gamepad2.b)
+        else if(gamepad2.right_stick_y>0)
         {
-            pincer.setPosition(pincerClosed);
+            arm.setPower(.2);
         }
+        else{
+            arm.setPower(0);
+        }
+
+        if(gamepad2.a&&!buttonPressed)
+        {
+            newPincerPos = pincer.getPosition()+.05;
+            pincer.setPosition(Math.min(newPincerPos, 1));
+            buttonPressed = !buttonPressed;
+        }
+        else if(gamepad2.b && !buttonPressed)
+        {
+            newPincerPos = pincer.getPosition()-.05;
+            pincer.setPosition(Math.max(newPincerPos, 0));
+            buttonPressed = !buttonPressed;
+        }
+
         //telemetry.addData("current servo position: ", pincer.getPosition());
         //telemetry.addData("encoder counts: ",arm.getCurrentPosition());
         //telemetry.addData("gamepad joystick val: ", gamepad2.left_stick_y);
