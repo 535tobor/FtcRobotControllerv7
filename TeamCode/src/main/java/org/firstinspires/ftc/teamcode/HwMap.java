@@ -13,8 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class HwMap extends LinearOpMode {
 
-    public DcMotor fl, fr, br, bl;
+    public DcMotor fl, fr, br, bl,arm , extend;
     public CRServo carouSpin;
+
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
@@ -30,7 +31,11 @@ public class HwMap extends LinearOpMode {
         br = hardwareMap.dcMotor.get("br");
         fl.setDirection(DcMotor.Direction.REVERSE);
         bl.setDirection(DcMotor.Direction.REVERSE);
-        carouSpin = hardwareMap.crservo.get("carouSpin");
+
+        arm = hardwareMap.dcMotor.get("arm");
+        extend = hardwareMap.dcMotor.get("extender");
+
+        carouSpin = hardwareMap.crservo.get("carousel");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -42,10 +47,11 @@ public class HwMap extends LinearOpMode {
     public void runOpMode()  {
 
     }
-    public void spin(double time)
+    public void spin(double time, double power)
     {
+        runtime.reset();
         while (runtime.time() < time){
-            carouSpin.setPower(1);
+            carouSpin.setPower(power);
         }
         carouSpin.setPower(0);
     }
@@ -80,8 +86,10 @@ public class HwMap extends LinearOpMode {
     {
         setPowerAll(0);
     }
-    public void moveByTime(double speed, double time){
-        while (runtime.time() > time ){
+
+    public void driveByTime(double speed, double time){
+        runtime.reset();
+        while (runtime.time() < time ){
             setPowerAll(speed);
         }
         setPowerZero();

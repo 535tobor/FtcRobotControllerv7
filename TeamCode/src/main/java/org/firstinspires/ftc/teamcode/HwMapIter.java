@@ -19,7 +19,7 @@ public class HwMapIter extends OpMode {
     }
     public DcMotor fl, fr, br, bl, arm, extend;
     public Servo pincer;
-    public CRServo carouSpin, pincer1;
+    public CRServo carouSpin;
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
@@ -29,17 +29,20 @@ public class HwMapIter extends OpMode {
         fr = hardwareMap.dcMotor.get("fr");
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
-        carouSpin = hardwareMap.crservo.get("carouSpin");
+        carouSpin = hardwareMap.crservo.get("carousel");
         pincer = hardwareMap.servo.get("pincer");
-        pincer1 = hardwareMap.crservo.get("pincer1");
         arm = hardwareMap.dcMotor.get("arm");
-        extend = hardwareMap.dcMotor.get("extend");
+        extend = hardwareMap.dcMotor.get("extender");
+
         //test bot reverse statements
         //fr.setDirection(DcMotor.Direction.REVERSE);
         //br.setDirection(DcMotor.Direction.REVERSE);
+
+        //competition bot reverse statements
         fl.setDirection(DcMotor.Direction.REVERSE);
         bl.setDirection(DcMotor.Direction.REVERSE);
-        //servo = hardwareMap.servo.get("servo");
+
+        //Gyro
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -62,5 +65,17 @@ public class HwMapIter extends OpMode {
         }
 
         return (rotations * 360 + gyroAngles.firstAngle);
+    }
+
+    public void setPowerAll(double power)
+    {
+        fl.setPower(power);
+        fr.setPower(power);
+        bl.setPower(power);
+        br.setPower(power);
+    }
+    public void setPowerZero()
+    {
+        setPowerAll(0);
     }
 }

@@ -11,7 +11,7 @@ public class MainTeleOp extends HwMapIter{
     @Override
     public void init()
     {
-        initHwMap(); newPincerPos = pincer.getPosition();
+        initHwMap();
     }
     @Override
     public void init_loop()
@@ -27,30 +27,37 @@ public class MainTeleOp extends HwMapIter{
     public void loop()
     {
         // controller one... driving
-        if(Math.abs(gamepad1.left_stick_y)>.1)
+        if((Math.abs(gamepad1.left_stick_y)>.1)&&(Math.abs(gamepad1.right_stick_y)>.1) )
         {
             fl.setPower(-gamepad1.left_stick_y);
             bl.setPower(-gamepad1.left_stick_y);
-        }
-        else {
-            fl.setPower(0);
-            bl.setPower(0);
-        }
-        if(Math.abs(gamepad1.right_stick_y)>.1) {
             fr.setPower(-gamepad1.right_stick_y);
             br.setPower(-gamepad1.right_stick_y);
         }
-        else {
-            fr.setPower(0);
-            br.setPower(0);
+        else if(gamepad1.right_trigger>.1)
+        {
+            fl.setPower(gamepad1.right_trigger*.5);
+            bl.setPower(gamepad1.right_trigger*.5);
+            fr.setPower(-gamepad1.right_trigger*.5);
+            br.setPower(-gamepad1.right_trigger*.5);
         }
-
+        else if(gamepad1.left_trigger>.1)
+        {
+            fl.setPower(-gamepad1.left_trigger*.5);
+            bl.setPower(-gamepad1.left_trigger*.5);
+            fr.setPower(gamepad1.left_trigger*.5);
+            br.setPower(gamepad1.left_trigger*.5);
+        }
+        else {
+            setPowerZero();
+        }
+    //robot.game(win);
         //  controller two... arm/claw/carouspinner
 
-        if(gamepad1.left_bumper) {
+        if(gamepad2.left_bumper) {
             carouSpin.setPower(1);
         }
-        else if(gamepad1.right_bumper) {
+        else if(gamepad2.right_bumper) {
             carouSpin.setPower(-1);
         }
         else{
@@ -61,11 +68,11 @@ public class MainTeleOp extends HwMapIter{
         //armDownRangeIsValid = arm.getCurrentPosition()>downRange;
         if(gamepad2.left_stick_y<0)//&&armDownRangeIsValid)
         {
-            extend.setPower(-1);
+            extend.setPower(1);
         }
         else if(gamepad2.left_stick_y>0)//&&armUpRangeIsValid)
         {
-            extend.setPower(1);
+            extend.setPower(-1);
         }
         else{
             extend.setPower(0);
@@ -73,30 +80,29 @@ public class MainTeleOp extends HwMapIter{
 
         if(gamepad2.right_stick_y<0)
         {
-            arm.setPower(-.2);
+            arm.setPower(.4);
         }
         else if(gamepad2.right_stick_y>0)
         {
-            arm.setPower(.2);
+            arm.setPower(-.4);
         }
         else{
             arm.setPower(0);
         }
 
-        if(gamepad2.a&&!buttonPressed)
+        if(gamepad2.a)//&&!buttonPressed)
         {
-            newPincerPos = pincer.getPosition()+.05;
-            pincer.setPosition(Math.min(newPincerPos, 1));
-            buttonPressed = !buttonPressed;
+            pincer.setPosition(1);
+            //buttonPressed = !buttonPressed;
         }
-        else if(gamepad2.b && !buttonPressed)
+        else if(gamepad2.b)//&&!buttonPressed)
         {
-            newPincerPos = pincer.getPosition()-.05;
-            pincer.setPosition(Math.max(newPincerPos, 0));
-            buttonPressed = !buttonPressed;
+            pincer.setPosition(0);
+            //buttonPressed = !buttonPressed;
         }
 
-        //telemetry.addData("current servo position: ", pincer.getPosition());
+        telemetry.addData("current servo position: ", pincer.getPosition());
+        telemetry.update();
         //telemetry.addData("encoder counts: ",arm.getCurrentPosition());
         //telemetry.addData("gamepad joystick val: ", gamepad2.left_stick_y);
 
