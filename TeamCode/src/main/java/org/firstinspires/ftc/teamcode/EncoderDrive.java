@@ -111,16 +111,12 @@ public class EncoderDrive extends HwMap {
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-//    public void preloadBoxScore(int forwardIN, int degrees, int hubIN, int armExtend, int armRotate)
-//    {
-//        encoderDrive(.8, .8, forwardIN, 5, 1);// move forward to not run into wall
-//        turn(degrees);
-//        encoderDrive(.8, .8, hubIN, 5, 1);
-//        while(opModeIsActive()&&((threshold(extend.getCurrentPosition(), armExtend, 25)||(threshold(arm.getCurrentPosition(), armRotate, 25)))))
-//        {
-//
-//        }
-//    }
+    public void preloadBoxScore(int forwardIN, int degrees, int hubIN, int armExtend, int armRotate)
+    {
+        encoderDrive(.8, .8, forwardIN, 5, 1);// move forward to not run into wall
+        turn(degrees);
+        encoderDrive(.8, .8, hubIN, 5, 1);
+    }
 
 
 }
