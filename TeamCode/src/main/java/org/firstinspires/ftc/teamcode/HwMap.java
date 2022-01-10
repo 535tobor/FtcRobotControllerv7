@@ -175,4 +175,10 @@ public class HwMap extends LinearOpMode {
         bl.setPower(0);
         br.setPower(0);
     }
+
+    public boolean threshold(int val, int otherval, int range)
+    {
+        return (val>( otherval + range)||val<( otherval - range));
+    }
 }
+

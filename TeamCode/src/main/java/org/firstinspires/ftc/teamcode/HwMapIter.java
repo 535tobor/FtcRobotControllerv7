@@ -29,10 +29,10 @@ public class HwMapIter extends OpMode {
         fr = hardwareMap.dcMotor.get("fr");
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
-        carouSpin = hardwareMap.crservo.get("carousel");
-        pincer = hardwareMap.servo.get("pincer");
-        arm = hardwareMap.dcMotor.get("arm");
-        extend = hardwareMap.dcMotor.get("extender");
+//        carouSpin = hardwareMap.crservo.get("carousel");
+//        pincer = hardwareMap.servo.get("pincer");
+//        arm = hardwareMap.dcMotor.get("arm");
+//        extend = hardwareMap.dcMotor.get("extender");
 
         //test bot reverse statements
         //fr.setDirection(DcMotor.Direction.REVERSE);
