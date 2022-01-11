@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class HwMap extends LinearOpMode {
 
     public DcMotor fl, fr, br, bl,arm , extend, carouSpin;
+    public Servo pincer;
 
     public int rotations = 0;
     public BNO055IMU imu;
@@ -33,6 +34,7 @@ public class HwMap extends LinearOpMode {
         carouSpin = hardwareMap.dcMotor.get("carousel");
         arm = hardwareMap.dcMotor.get("arm");
         extend = hardwareMap.dcMotor.get("extender");
+        pincer = hardwareMap.servo.get("pincer");
 
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -46,6 +48,7 @@ public class HwMap extends LinearOpMode {
     public void runOpMode()  {
 
     }
+
     public void spin(double time, double power)
     {
         runtime.reset();
@@ -54,11 +57,13 @@ public class HwMap extends LinearOpMode {
         }
         carouSpin.setPower(0);
     }
+
     public void updateGyro()
     {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
-    public double robotAngle() {
+
+    public double getRobotAngle() {
         if (desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
             rotations++;
         } else if (desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) < -200) {
@@ -96,9 +101,9 @@ public class HwMap extends LinearOpMode {
 
     public void turn(int degrees) //from current
     {
-        double initAngle = robotAngle();
+        double initAngle = getRobotAngle();
         double desiredAngle = initAngle + degrees;
-        while(opModeIsActive()&&(robotAngle()>( desiredAngle + 3)||robotAngle()<(desiredAngle- 3)))
+        while(opModeIsActive()&&(getRobotAngle()>( desiredAngle + 2)|| getRobotAngle()<(desiredAngle- 2)))
         {//left is pos
             updateGyro();
             if(degrees>0)
