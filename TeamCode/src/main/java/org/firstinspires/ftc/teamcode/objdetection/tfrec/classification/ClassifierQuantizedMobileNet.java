@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tfrec.classification;
+package org.firstinspires.ftc.teamcode.objdetection.tfrec.classification;
 
 import android.app.Activity;
 
@@ -6,9 +6,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.tensorflow.lite.support.common.TensorOperator;
 import org.tensorflow.lite.support.common.ops.NormalizeOp;
 
-import java.io.IOException;
-
-public class ClassifierQuantizedEfficientNet extends Classifier {
+public class ClassifierQuantizedMobileNet extends Classifier {
     /**
      * The quantized model does not require normalization, thus set mean as 0.0f, and std as 1.0f to
      * bypass the normalization.
@@ -27,7 +25,7 @@ public class ClassifierQuantizedEfficientNet extends Classifier {
      *
      * @param activity
      */
-    public ClassifierQuantizedEfficientNet(Activity activity, Device device, int numThreads, String modelFileName, String labelFileName, Telemetry t)
+    public ClassifierQuantizedMobileNet(Activity activity, Device device, int numThreads, String modelFileName, String labelFileName, Telemetry t)
             throws Exception {
         super(activity, device, numThreads, modelFileName, labelFileName, t);
     }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tfrec.classification;
+package org.firstinspires.ftc.teamcode.objdetection.tfrec.classification;
 
 import android.app.Activity;
 
@@ -6,13 +6,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.tensorflow.lite.support.common.TensorOperator;
 import org.tensorflow.lite.support.common.ops.NormalizeOp;
 
-import java.io.IOException;
-
-public class ClassifierFloatMobileNet extends Classifier {
-    /** Float MobileNet requires additional normalization of the used input. */
-    private static final float IMAGE_MEAN = 127.5f;
-
-    private static final float IMAGE_STD = 127.5f;
+public class ClassifierFloatEfficientNet extends Classifier {
+    private static final float IMAGE_MEAN = 127.0f;
+    private static final float IMAGE_STD = 128.0f;
 
     /**
      * Float model does not need dequantization in the post-processing. Setting mean and std as 0.0f
@@ -27,7 +23,7 @@ public class ClassifierFloatMobileNet extends Classifier {
      *
      * @param activity
      */
-    public ClassifierFloatMobileNet(Activity activity, Device device, int numThreads, String modelFileName, String labelFileName, Telemetry t)
+    public ClassifierFloatEfficientNet(Activity activity, Device device, int numThreads, String modelFileName, String labelFileName, Telemetry t)
             throws Exception {
         super(activity, device, numThreads, modelFileName, labelFileName, t);
     }

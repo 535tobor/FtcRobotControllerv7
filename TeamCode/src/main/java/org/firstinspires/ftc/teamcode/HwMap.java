@@ -76,15 +76,15 @@ public class HwMap extends LinearOpMode {
     {
         fl.setMode(mode);
         fr.setMode(mode);
-        bl.setMode(mode);
-        br.setMode(mode);
+        //bl.setMode(mode);
+        //br.setMode(mode);
     }
     public void setPowerAll(double power)
     {
         fl.setPower(power);
         fr.setPower(power);
-        bl.setPower(power);
-        br.setPower(power);
+        //bl.setPower(power);
+        //br.setPower(power);
     }
     public void setPowerZero()
     {
@@ -110,15 +110,15 @@ public class HwMap extends LinearOpMode {
             {
                 fl.setPower(-.7);
                 fr.setPower(.7);
-                bl.setPower(-.7);
-                br.setPower(.7);
+                //bl.setPower(-.7);
+                //br.setPower(.7);
             }
             else
             {
                 fl.setPower(.7);
                 fr.setPower(-.7);
-                bl.setPower(.7);
-                br.setPower(-.7);
+                //bl.setPower(.7);
+                //br.setPower(-.7);
             }
         }
         setPowerAll(0);
@@ -131,14 +131,15 @@ public class HwMap extends LinearOpMode {
         // reset the timeout time and start motion.
         runtime.reset();
         // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-        while ( opModeIsActive() && (runtime.seconds() < timeoutS) &&
-                (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&
-                        Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget)) {
-            double rem = (Math.abs(fl.getCurrentPosition()) + Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
+        while ( opModeIsActive() && (runtime.seconds() < timeoutS) && Math.abs(fl.getCurrentPosition())< newLeftTarget && Math.abs(fr.getCurrentPosition()) < newRightTarget)
+//                (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&
+//                        Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget))
+        {
+            double rem = (Math.abs(fl.getCurrentPosition()) + Math.abs(fr.getCurrentPosition()))/2;//Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
             double NLspeed;
             double NRspeed;
-            boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&
-                    Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
+            boolean tele = Math.abs(fl.getCurrentPosition())< newLeftTarget && Math.abs(fr.getCurrentPosition()) < newRightTarget;//(Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&
+                    //Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
             boolean why = (runtime.seconds() < timeoutS);
             telemetry.addData("time bool: "+why+ " cur Pos bool: ",tele);
             telemetry.update();
@@ -169,20 +170,34 @@ public class HwMap extends LinearOpMode {
             }
             //Pass the seed values to the motors
             fl.setPower(NLspeed);
-            bl.setPower(NLspeed);
+            //bl.setPower(NLspeed);
             fr.setPower(NRspeed);
-            br.setPower(NRspeed);
+            //br.setPower(NRspeed);
         }
         // Stop all motion;
         fl.setPower(0);
         fr.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
+//        bl.setPower(0);
+//        br.setPower(0);
     }
 
     public boolean threshold(int val, int otherval, int range)
     {
         return (val>( otherval + range)||val<( otherval - range));
+    }
+
+    public void runEncoder(DcMotor motor, int desiredCounts,  int thresholdRange, double power)
+    {
+        power = Math.abs(power);
+        if(motor.getCurrentPosition()<desiredCounts)
+        {
+            power = -power;
+        }
+        while(threshold(motor.getCurrentPosition(), desiredCounts, thresholdRange))
+        {
+            motor.setPower(power);
+        }
+        motor.setPower(0);
     }
 }
 

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="RightSidePark")
 @Disabled
-public class LeftBlue extends HwMap {
+public class TimeAuto extends HwMap {
 
 
     @Override

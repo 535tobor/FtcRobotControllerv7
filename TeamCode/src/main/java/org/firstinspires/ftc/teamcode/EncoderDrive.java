@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="EncoderDrive")
-@Disabled
+//@Disabled
 public class EncoderDrive extends HwMap {
-
+    double inches = 0;
     @Override
     public void runOpMode()
     {
@@ -16,11 +15,18 @@ public class EncoderDrive extends HwMap {
         while(!isStarted()&&!isStopRequested()) //init
         {
             updateGyro();
+//            if(gamepad1.a)
+//            {
+//                inches+=.1;
+//            }
+//            telemetry.addData("current inches: ", inches);
             telemetry.update();
         }
         if(opModeIsActive()) //run
         {
-            warehousePark(-55);
+            carousel(39);
+            //encoderDrive(.6, .6, inches, 5,1);
+            //warehousePark(-55);
         }
     }
     public void warehousePark(int degrees)
@@ -33,36 +39,36 @@ public class EncoderDrive extends HwMap {
 
     public void carousel(int degrees)
     {
-        encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
-        turn(degrees);// turn towards the right so the back of the bot carou spinner is facing the carousel
-        sleep(250);
-        encoderDrive(-.8, -.8, 7, 7, 1);// backward towards carousel
-        spin(5, -1); //spin the carousel
+        encoderDrive(.8, .8, 17, 5, 1);// move forward to not run into wall
+        turn(-degrees);// turn towards the right so the back of the bot carou spinner is facing the carousel
+        sleep(1000);
+        encoderDrive(-.8, -.8, 15, 7, 1);// backward towards carousel
+        spin(5, .45); //spin the carousel
         //park
         encoderDrive(.8, .8, 5, 5, 1); //drive forward to move away from spinner
-        turn(-degrees);//turn to face parking
+        turn(degrees);//turn to face parking
         encoderDrive(.8, .8,10, 7, 1); //park
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-
-    public void preloadBoxScore(int forwardIN, int degrees, int hubIN, int armExtendEncoderCounts, int pincerOpenPos, int inchesToCarousel, int turnToParkDeg, int parkIN)
-    {
-        encoderDrive(.8, .8, forwardIN, 5, 1);// move forward to not run into wall
-        turn(degrees); // turn right to face hub and be ready to drive back into carousel spinner
-        encoderDrive(.8, .8, hubIN, 5, 1); // drive to hub
-        while(threshold(extend.getCurrentPosition(), armExtendEncoderCounts, 25)) //extend arm
-        {
-            extend.setPower(.7);
-        }
-        extend.setPower(0);
-        pincer.setPosition(pincerOpenPos); //open pincer to score box
-        //sleep statement?
-        encoderDrive(-.8, -.8, inchesToCarousel, 5, 1); //drive back to carousel
-        spin(4, .8);//run the carousel spinner to score the duck
-        carouSpin.setPower(0);
-        turn(turnToParkDeg); //turn to park
-        encoderDrive(.8, .8, parkIN, 5, 1); //drive forward and park
-    }
+//
+//    public void preloadBoxScore(int forwardIN, int degrees, int hubIN, int armExtendEncoderCounts, int pincerOpenPos, int inchesToCarousel, int turnToParkDeg, int parkIN)
+//    {
+//        encoderDrive(.8, .8, forwardIN, 5, 1);// move forward to not run into wall
+//        turn(degrees); // turn right to face hub and be ready to drive back into carousel spinner
+//        encoderDrive(.8, .8, hubIN, 5, 1); // drive to hub
+//        while(threshold(extend.getCurrentPosition(), armExtendEncoderCounts, 25)) //extend arm
+//        {
+//            extend.setPower(.7);
+//        }
+//        extend.setPower(0);
+//        pincer.setPosition(pincerOpenPos); //open pincer to score box
+//        //sleep statement?
+//        encoderDrive(-.8, -.8, inchesToCarousel, 5, 1); //drive back to carousel
+//        spin(4, .8);//run the carousel spinner to score the duck
+//        carouSpin.setPower(0);
+//        turn(turnToParkDeg); //turn to park
+//        encoderDrive(.8, .8, parkIN, 5, 1); //drive forward and park
+//    }
 
 
 }

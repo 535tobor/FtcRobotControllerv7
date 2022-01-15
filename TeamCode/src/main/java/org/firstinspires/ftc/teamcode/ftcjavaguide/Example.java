@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode; //location of class
+package org.firstinspires.ftc.teamcode.ftcjavaguide; //location of class
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode; //import information from an outside location
 

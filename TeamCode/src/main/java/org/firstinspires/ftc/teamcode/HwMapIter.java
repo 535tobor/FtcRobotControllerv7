@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,9 +16,9 @@ public class HwMapIter extends OpMode {
     public void init() {
 
     }
-    public DcMotor fl, fr, br, bl, arm, extend;
+    public DcMotor fl, fr, br, bl, arm, extend, carouSpin;
     public Servo pincer;
-    public CRServo carouSpin;
+
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
@@ -29,7 +28,7 @@ public class HwMapIter extends OpMode {
         fr = hardwareMap.dcMotor.get("fr");
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
-        carouSpin = hardwareMap.crservo.get("carousel");
+        carouSpin = hardwareMap.dcMotor.get("carousel");
         pincer = hardwareMap.servo.get("pincer");
         arm = hardwareMap.dcMotor.get("arm");
         extend = hardwareMap.dcMotor.get("extender");
@@ -71,8 +70,8 @@ public class HwMapIter extends OpMode {
     {
         fl.setPower(power);
         fr.setPower(power);
-        bl.setPower(power);
-        br.setPower(power);
+        //bl.setPower(power);
+        //br.setPower(power);
     }
     public void setPowerZero()
     {
