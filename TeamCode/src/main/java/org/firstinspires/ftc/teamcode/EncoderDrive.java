@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="EncoderDrive")
-//@Disabled
+@Disabled
 public class EncoderDrive extends HwMap {
     double inches = 0;
     @Override
@@ -24,8 +25,11 @@ public class EncoderDrive extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            carousel(39);
-            //encoderDrive(.6, .6, inches, 5,1);
+            //carousel(39);
+            driveByTime(-.6,.5);
+            turn(90);
+            driveByTime(.6,2);
+
             //warehousePark(-55);
         }
     }

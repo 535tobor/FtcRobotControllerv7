@@ -55,7 +55,7 @@ public class HwMapIter extends OpMode {
     {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
-    public double getIntegratedHeading() {
+    public double getRoboAngle() {
         if(desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
             rotations++;
         }

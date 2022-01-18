@@ -52,7 +52,7 @@ public class HwMap extends LinearOpMode {
     public void spin(double time, double power)
     {
         runtime.reset();
-        while (runtime.time() < time){
+        while (opModeIsActive()&& runtime.time() < time){
             carouSpin.setPower(power);
         }
         carouSpin.setPower(0);
@@ -93,7 +93,7 @@ public class HwMap extends LinearOpMode {
 
     public void driveByTime(double speed, double time){
         runtime.reset();
-        while (runtime.time() < time ){
+        while (opModeIsActive() && runtime.time() < time ){
             setPowerAll(speed);
         }
         setPowerZero();
@@ -193,7 +193,7 @@ public class HwMap extends LinearOpMode {
         {
             power = -power;
         }
-        while(threshold(motor.getCurrentPosition(), desiredCounts, thresholdRange))
+        while(opModeIsActive()&& threshold(motor.getCurrentPosition(), desiredCounts, thresholdRange))
         {
             motor.setPower(power);
         }

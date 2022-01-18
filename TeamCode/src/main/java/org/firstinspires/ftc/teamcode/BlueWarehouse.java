@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name="RightSidePark")
-@Disabled
-public class TimeAuto extends HwMap {
+@Autonomous(name="Blue Warehouse")
+//@Disabled
+public class BlueWarehouse extends HwMap {
 
 
     @Override
@@ -21,11 +20,10 @@ public class TimeAuto extends HwMap {
         if(opModeIsActive()) //run
         {
             //extend.setPower(.4);
-            driveByTime(.5, .75);
-           // extend.setPower(0);
-            turn(-69); // not to be funny, we are professionals
 
-            driveByTime(.5, 2);
+            driveByTime(-.6,.5);
+            turn(-90);
+            driveByTime(.6,2);
         }
     }
 }

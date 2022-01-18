@@ -13,6 +13,7 @@ public class MainTeleOp extends HwMapIter{
     {
         initHwMap();
         curPincerPos = pincer.getPosition();
+        updateGyro();
     }
     @Override
     public void init_loop()
@@ -48,6 +49,16 @@ public class MainTeleOp extends HwMapIter{
             //bl.setPower(-gamepad1.left_trigger*.5);
             fr.setPower(gamepad1.left_trigger*.5);
             //br.setPower(gamepad1.left_trigger*.5);
+        }
+        else if (gamepad1.x)
+        {
+            fl.setPower(-1);
+            fr.setPower(1);
+        }
+        else if(gamepad1.b)
+        {
+            fl.setPower(1);
+            fr.setPower(-1);
         }
         else if (gamepad1.dpad_up){
             setPowerAll(-.1);
@@ -135,9 +146,9 @@ public class MainTeleOp extends HwMapIter{
         }
         curPincerPos = Math.max(0, curPincerPos);
         //curPincerPos = Math.min(.375, curPincerPos);
-        telemetry.addData("current servo position: ", pincer.getPosition());
-        telemetry.addData("current encoder count: ", arm.getCurrentPosition());
-        telemetry.addData("current encoder count: ", extend.getCurrentPosition());
+        //telemetry.addData("current servo position: ", pincer.getPosition());
+        //telemetry.addData("current encoder count: ", arm.getCurrentPosition());
+        //telemetry.addData("current encoder count: ", extend.getCurrentPosition());
         telemetry.update();
         //telemetry.addData("encoder counts: ",arm.getCurrentPosition());
         //telemetry.addData("gamepad joystick val: ", gamepad2.left_stick_y);
