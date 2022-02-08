@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.objdetection.tfrec.classification;
+package org.firstinspires.ftc.teamcode.objdetection.tfrectm.classification;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

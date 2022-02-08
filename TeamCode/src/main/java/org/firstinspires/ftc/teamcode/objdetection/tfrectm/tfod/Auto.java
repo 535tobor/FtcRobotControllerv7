@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tfod;
+package org.firstinspires.ftc.teamcode.objdetection.tfrectm.tfod;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;

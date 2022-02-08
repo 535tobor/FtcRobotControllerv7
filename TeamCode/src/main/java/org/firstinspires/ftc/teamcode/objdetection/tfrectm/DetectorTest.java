@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.objdetection.tfrec;
+package org.firstinspires.ftc.teamcode.objdetection.tfrectm;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.classification.Classifier;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.classification.Classifier;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class DetectorTest extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime time = new ElapsedTime();
 
-    private static String MODEL_FILE_NAME = "barcode.tflite";
+    private static String MODEL_FILE_NAME = "model.tflite";
     private static String LABEL_FILE_NAME = "labels.txt";
     private static Classifier.Model MODEl_TYPE = Classifier.Model.FLOAT_EFFICIENTNET;
 

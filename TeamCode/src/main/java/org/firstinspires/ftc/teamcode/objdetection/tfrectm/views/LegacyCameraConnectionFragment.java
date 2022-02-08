@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.objdetection.tfrec.views;
+package org.firstinspires.ftc.teamcode.objdetection.tfrectm.views;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.utils.ImageUtils;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.utils.ImageUtils;
 
 import java.io.IOException;
 import java.util.List;

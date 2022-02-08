@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="Blue Warehouse")
-//@Disabled
+@Disabled
 public class BlueWarehouse extends HwMap {
 
 
@@ -22,7 +23,7 @@ public class BlueWarehouse extends HwMap {
             //extend.setPower(.4);
 
             driveByTime(-.6,.5);
-            turn(-90);
+            turn(-90, 5);
             driveByTime(.6,2);
         }
     }

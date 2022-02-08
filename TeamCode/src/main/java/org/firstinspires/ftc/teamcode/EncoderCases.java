@@ -92,7 +92,7 @@ public class EncoderCases extends HwMap {
     public void warehousePark(int degrees)
     {
         encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
-        turn(degrees);// turn towards the warehouse
+        turn(degrees, 5);// turn towards the warehouse
         sleep(250);
         encoderDrive(.8, .8, 16, 7, 1);// drive into warehouse
     }
@@ -100,13 +100,13 @@ public class EncoderCases extends HwMap {
     public void carousel(int degrees)
     {
         encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
-        turn(degrees);// turn towards the right so the back of the bot carou spinner is facing the carousel
+        turn(degrees, 5);// turn towards the right so the back of the bot carou spinner is facing the carousel
         sleep(250);
         encoderDrive(-.8, -.8, 7, 7, 1);// backward towards carousel
         spin(5, -1); //spin the carousel
         //park
         encoderDrive(.8, .8, 5, 5, 1); //drive forward to move away from spinner
-        turn(-degrees);//turn to face parking
+        turn(-degrees, 5);//turn to face parking
         encoderDrive(.8, .8,10, 7, 1); //park
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
@@ -114,7 +114,7 @@ public class EncoderCases extends HwMap {
     public void preloadBoxScore(int forwardIN, int degrees, int hubIN, int armExtendEncoderCounts, int pincerOpenPos, int inchesToCarousel, int turnToParkDeg, int parkIN)
     {
         encoderDrive(.8, .8, forwardIN, 5, 1);// move forward to not run into wall
-        turn(degrees); // turn right to face hub and be ready to drive back into carousel spinner
+        turn(degrees,5); // turn right to face hub and be ready to drive back into carousel spinner
         encoderDrive(.8, .8, hubIN, 5, 1); // drive to hub
         while(threshold(extend.getCurrentPosition(), armExtendEncoderCounts, 25)) //extend arm
         {
@@ -126,7 +126,7 @@ public class EncoderCases extends HwMap {
         encoderDrive(-.8, -.8, inchesToCarousel, 5, 1); //drive back to carousel
         spin(4, .8);//run the carousel spinner to score the duck
         carouSpin.setPower(0);
-        turn(turnToParkDeg); //turn to park
+        turn(turnToParkDeg, 5); //turn to park
         encoderDrive(.8, .8, parkIN, 5, 1); //drive forward and park
     }
 

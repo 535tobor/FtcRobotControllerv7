@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.objdetection.tfrec;
+package org.firstinspires.ftc.teamcode.objdetection.tfrectm;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -24,13 +24,13 @@ import android.widget.FrameLayout;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.classification.Classifier;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.classification.Classifier.Device;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.classification.Classifier.Model;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.utils.BorderedText;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.utils.ImageUtils;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.views.CameraConnectionFragment;
-import org.firstinspires.ftc.teamcode.objdetection.tfrec.views.LegacyCameraConnectionFragment;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.classification.Classifier;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.classification.Classifier.Device;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.classification.Classifier.Model;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.utils.BorderedText;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.utils.ImageUtils;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.views.CameraConnectionFragment;
+import org.firstinspires.ftc.teamcode.objdetection.tfrectm.views.LegacyCameraConnectionFragment;
 
 import java.nio.ByteBuffer;
 import java.util.List;

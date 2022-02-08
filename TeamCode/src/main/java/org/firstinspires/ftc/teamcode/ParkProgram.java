@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name="LeftSidePark")
+@Autonomous(name="Park")
 @Disabled
 public class ParkProgram extends HwMap {
 
@@ -20,9 +20,9 @@ public class ParkProgram extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            driveByTime(.5, 1.5);
-            turn(90);
-            driveByTime(.5, 1.5);
+            driveByTime(.7, 5);
+            //turn(90, 5);
+            //driveByTime(.5, 1.5);
         }
     }
 }

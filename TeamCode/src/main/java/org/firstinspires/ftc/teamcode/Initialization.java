@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Initialization")
-
+@Disabled
 public class Initialization extends HwMap{
     @Override
     public void runOpMode()
@@ -16,11 +17,11 @@ public class Initialization extends HwMap{
         }
         if(opModeIsActive())
         {
-            pincer.setPosition(0.025);
+            //pincer.setPosition(0.025);
+            //sleep(2000);
+            runEncoder(extend, -10, 40, .75);
             sleep(2000);
-            runEncoder(extend, -1583, 250, .75);
-            sleep(2000);
-            runEncoder(arm, 1127, 250, .4);
+            runEncoder(arm, 730, 20, .4);
         }
     }
 }
