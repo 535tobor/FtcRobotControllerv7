@@ -10,6 +10,7 @@ public class DeliverBoxRedDepot extends  HwMap{
     @Override
     public void runOpMode()
     {
+        side = "left";
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {

@@ -19,7 +19,7 @@ public class DistanceSensorTest extends HwMap{
         if(opModeIsActive())
         {
 
-            while(opModeIsActive()&&threshold(ds.getDistance(DistanceUnit.CM), 11.9, .3)&&timer.time()<3)
+            while(opModeIsActive()&&threshold(dsL.getDistance(DistanceUnit.CM), 11.9, .3)&&timer.time()<3)
             {
                 arm.setPower(.4);
             }

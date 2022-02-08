@@ -17,7 +17,7 @@ public class HwMap extends LinearOpMode {
 
     public DcMotor fl, fr, br, bl,arm , extend, carouSpin;
     public Servo pincer;
-    public DistanceSensor ds;
+    public DistanceSensor dsL, dsR;
 
     public int rotations = 0;
     public BNO055IMU imu;
@@ -26,6 +26,7 @@ public class HwMap extends LinearOpMode {
     public final double WHEEL_DIA = 5.65;
     public final double COUNTS_PER_INCH = 1120/(WHEEL_DIA * 3.14);
     public ElapsedTime runtime = new ElapsedTime();
+    public String side = "empty";
 
     public void initHwMap()
     {
@@ -39,7 +40,8 @@ public class HwMap extends LinearOpMode {
         arm = hardwareMap.dcMotor.get("arm");
         extend = hardwareMap.dcMotor.get("extender");
         pincer = hardwareMap.servo.get("pincer");
-        ds = hardwareMap.get(DistanceSensor.class, "ds");
+        dsL = hardwareMap.get(DistanceSensor.class, "ds"); //left
+        dsR = hardwareMap.get(DistanceSensor.class, "ds2"); //right
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -275,13 +277,13 @@ public class HwMap extends LinearOpMode {
 
     public void driveByDistance( double desired, double multiplier)
     {
-        double divisor = desired - ds.getDistance(DistanceUnit.CM); //desired - initial
+        double divisor = desired - dsL.getDistance(DistanceUnit.CM); //desired - initial
         double power = .06;//start power greater than .055 so it complies with the while loop; algorithm c=
         multiplier = Math.max(0.1, multiplier);
         multiplier = Math.min(1, multiplier);
-        while(opModeIsActive()&&threshold(ds.getDistance(DistanceUnit.CM), desired, .3) && Math.abs(power)>.055)
+        while(opModeIsActive()&&threshold(dsL.getDistance(DistanceUnit.CM), desired, .3) && Math.abs(power)>.055)
         {
-            power = ((ds.getDistance(DistanceUnit.CM)-desired)/divisor)*multiplier;
+            power = ((dsL.getDistance(DistanceUnit.CM)-desired)/divisor)*multiplier;
             setPowerAll(power);
         }
         setPowerZero();
@@ -375,6 +377,28 @@ public class HwMap extends LinearOpMode {
         encoderDrive(-.7, -.7, 3, 5, 1);
         turn(degreesToPark, 4);
         encoderDrive(-.7, -.7, inchesToBackUp, 8, 1);
+    }
+
+    public String barcodeDetect() {
+        if (side.equals("left")) {
+            if (dsL.getDistance(DistanceUnit.CM) < 60) {
+                return "Middle";
+            } else if (dsR.getDistance(DistanceUnit.CM) < 60) {
+                return "Bottom";
+            } else {
+                return "Top";
+            }
+
+        } else {
+            if (dsL.getDistance(DistanceUnit.CM) < 60) {
+                return "Bottom";
+            } else if (dsR.getDistance(DistanceUnit.CM) < 60) {
+                return "Middle";
+            } else {
+                return "Top";
+            }
+
+        }
     }
 
 }

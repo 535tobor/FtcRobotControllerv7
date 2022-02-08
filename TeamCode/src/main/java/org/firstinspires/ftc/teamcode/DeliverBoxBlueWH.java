@@ -11,6 +11,7 @@ public class DeliverBoxBlueWH extends  HwMap{
     @Override
     public void runOpMode()
     {
+        side = "left";
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {

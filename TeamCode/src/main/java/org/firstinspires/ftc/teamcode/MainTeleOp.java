@@ -78,10 +78,10 @@ public class MainTeleOp extends HwMapIter{
         //  controller two... arm/claw/carouspinner
 
         if(gamepad2.left_bumper) {
-            carouSpin.setPower(.3);
+            carouSpin.setPower(.55);
         }
         else if(gamepad2.right_bumper) {
-            carouSpin.setPower(-.3);
+            carouSpin.setPower(-.55);
         }
         else{
             carouSpin.setPower(0);
@@ -136,7 +136,8 @@ public class MainTeleOp extends HwMapIter{
         telemetry.addData("current servo position: ", pincer.getPosition());
         //telemetry.addData("arm encoder counts: ", arm.getCurrentPosition());
         //telemetry.addData("extend encoder counts: ", extend.getCurrentPosition());
-        telemetry.addData("Ds: ", ds.getDistance(DistanceUnit.CM));
+        telemetry.addData("Ds: ", dsL.getDistance(DistanceUnit.CM));
+        telemetry.addData("Ds2: ", dsR.getDistance(DistanceUnit.CM));
         telemetry.update();
 
     }
