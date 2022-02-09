@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class DeliverBoxBlueWH extends  HwMap{
     ElapsedTime timer = new ElapsedTime();
     int armCts = 0;
+    String level = "";
     @Override
     public void runOpMode()
     {
@@ -15,6 +16,7 @@ public class DeliverBoxBlueWH extends  HwMap{
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {
+            level = barcodeDetect(); // loop in initialization, keep checking
             updateGyro();
             telemetry.addData("", pincer.getPosition());
             telemetry.update();

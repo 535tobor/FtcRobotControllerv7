@@ -23,8 +23,7 @@ public class HwMap extends LinearOpMode {
     public BNO055IMU imu;
     public Orientation gyroAngles;
     public double desiredRobotHeading;
-    public final double WHEEL_DIA = 5.65;
-    public final double COUNTS_PER_INCH = 1120/(WHEEL_DIA * 3.14);
+    public final double WHEEL_DIA = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIA * 3.14);
     public ElapsedTime runtime = new ElapsedTime();
     public String side = "empty";
 
@@ -326,15 +325,6 @@ public class HwMap extends LinearOpMode {
     {
 
         motorRTPIdle(arm, arm.getCurrentPosition()+850, .4); //lower arm to chassis base
-        //arm will sink lower because brake is not on, but the arm will be at a good position
-        //timer.reset();
-//        while(opModeIsActive()&&threshold(ds.getDistance(DistanceUnit.CM), 11.9, .3)&&timer.time()<3)
-//        {
-//            arm.setPower(.4);
-//        }
-//        arm.setPower(0);
-//        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         sleep(1000);
 
         pincer.setPosition(.375); // grip block
@@ -388,7 +378,11 @@ public class HwMap extends LinearOpMode {
             } else {
                 return "Top";
             }
-
+            // left         right
+            // _  _  _   O  _  _  _
+            //    ^  ^      ^  ^
+            //    L  R      L  R
+            //   Mid Bot   Bot Mid 
         } else {
             if (dsL.getDistance(DistanceUnit.CM) < 60) {
                 return "Bottom";
