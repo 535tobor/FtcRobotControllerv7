@@ -27,6 +27,9 @@ public class HwMap extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
     public String side = "empty", level = "empty";
 
+    /**
+     * Sets up hardware map for chassis and other mechanisms
+     */
     public void initHwMap()
     {
         fl = hardwareMap.dcMotor.get("fl");
@@ -51,14 +54,27 @@ public class HwMap extends LinearOpMode {
     @Override
     public void runOpMode()  {}
 
+    /**
+     * Sets pincer servo position to closed, or gripped
+     */
     public void pincerGrip()
     {
         pincer.setPosition(.375);
     }
+
+    /**
+     * Sets pincer servo position to open, or released
+     */
     public void pincerRelease()
     {
         pincer.setPosition(0);
     }
+
+    /**
+     * Powers the carousel spinning motor for a variable amount of time
+     * @param time in seconds
+     * @param power from -1.0 to 1.0
+     */
     public void spin(double time, double power)
     {
         runtime.reset();
@@ -68,11 +84,17 @@ public class HwMap extends LinearOpMode {
         carouSpin.setPower(0);
     }
 
+    /**
+     * Updates current robot angle according to IMU Gyro, use in a loop
+     */
     public void updateGyro()
     {
         gyroAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
+    /**
+     * @return the angle of the robot according to the IMU Gyro
+     */
     public double getRobotAngle() {
         if (desiredRobotHeading - (rotations * 360 + gyroAngles.firstAngle) > 200) {
             rotations++;
@@ -81,27 +103,56 @@ public class HwMap extends LinearOpMode {
         }
         return (rotations * 360 + gyroAngles.firstAngle);
     }
+
+    /**
+     * Set a run mode to the chassis motors
+     * @param mode motor run mode
+     */
     public void setModeAll(DcMotor.RunMode mode)
     {
         fl.setMode(mode); fr.setMode(mode); bl.setMode(mode); br.setMode(mode);
     }
+
+    /**
+     * Set a power to motors on the left side of the chassis
+     * @param power from -1.0 to 1.0
+     */
     public void setPowerLeft(double power)
     {
         fl.setPower(power); bl.setPower(power);
     }
+
+    /**
+     * Set a power to motors on the right side of the chassis
+     * @param power from -1.0 to 1.0
+     */
     public void setPowerRight(double power)
     {
         fr.setPower(power); br.setPower(power);
     }
+
+    /**
+     * Set a power to all motors of the chassis
+     * @param power from -1.0 to 1
+     */
     public void setPowerAll(double power)
     {
         setPowerLeft(power); setPowerRight(power);
     }
+
+    /**
+     * Stop all chassis motors by setting them to zero
+     */
     public void setPowerZero()
     {
         setPowerAll(0);
     }
 
+    /**
+     * Drive forward autonomously based on time
+     * @param speed from -1.0 to 1.0
+     * @param time in seconds
+     */
     public void driveByTime(double speed, double time){
         runtime.reset();
         while (opModeIsActive() && runtime.time() < time ){
@@ -110,6 +161,11 @@ public class HwMap extends LinearOpMode {
         setPowerZero();
     }
 
+    /**
+     * Drive and change the orientation of the robot based on the IMU gyro
+     * @param degrees from current angle
+     * @param timeoutS in seconds and used to force stop the method; timeout
+     */
     public void robotTurn(int degrees, double timeoutS) //from current
     {
 
@@ -132,6 +188,15 @@ public class HwMap extends LinearOpMode {
         }
         setPowerAll(0);
     }
+
+    /**
+     * Drives the chassis autonomously using the motors' built in encoders with an algorithm that averages the counts traveled instead of Run to position
+     * @param Lspeed from -1.0 to 1.0
+     * @param Rspeed from -1.0 to 1.0
+     * @param Inches the robot moves this increment
+     * @param timeoutS in seconds and used to force stop the method; timeout
+     * @param rampup increment used to "Slowly" ramp the motors up over time
+     */
     public void encoderDrive(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
         int newLeftTarget = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
         int newRightTarget= (fr.getCurrentPosition() + br.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
@@ -146,8 +211,6 @@ public class HwMap extends LinearOpMode {
             double rem = (Math.abs(fl.getCurrentPosition())+ Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
             double NLspeed, NRspeed;
             boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  && Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
-            boolean why = (runtime.seconds() < timeoutS);
-            telemetry.addData("time bool: "+why+ " cur Pos bool: ",tele);
             telemetry.update();
             //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over
             //the amount of time you set for this SubRun
@@ -181,6 +244,15 @@ public class HwMap extends LinearOpMode {
         // Stop all motion;
         setPowerZero();
     }
+
+    /**
+     * Drives the chassis autonomously using the encoderDrive algorithm and continues the run to position movement of the arm motor until it stops and then sets its brake
+     * @param Lspeed from -1.0 to 1.0
+     * @param Rspeed from -1.0 to 1.0
+     * @param Inches the robot moves this increment
+     * @param timeoutS in seconds and used to force stop the method; timeout
+     * @param rampup increment used to "Slowly" ramp the motors up over time
+     */
     public void encoderDriveAndMoveArm(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
         int newLeftTarget = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
         int newRightTarget= (fr.getCurrentPosition() + br.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
@@ -219,16 +291,36 @@ public class HwMap extends LinearOpMode {
         setPowerZero();
     }
 
-
+    /**
+     * (Integers) Sets up a range/threshold of values between ( b + number < a < b - number ) to account for hardware that cannot reach an exact value but can be stopped within a range
+     * @param val value that is being compared (a)
+     * @param otherval secondary comparison variable (b)
+     * @param range increment/decrement for the range (number)
+     * @return the boolean of the threshold
+     */
     public boolean threshold(int val, int otherval, int range)
     {
         return (val>( otherval + range)||val<( otherval - range));
     }
+    /**
+     * (Doubles) Sets up a range/threshold of values between ( b + number < a < b - number ) to account for hardware that cannot reach an exact value but can be stopped within a range
+     * @param val value that is being compared (a)
+     * @param otherval secondary comparison variable (b)
+     * @param range increment/decrement for the range (number)
+     * @return the boolean of the threshold
+     */
     public boolean threshold(double val, double otherval, double range)
     {
         return (val>( otherval + range)||val<( otherval - range));
     }
 
+    /**
+     *
+     * @param motor
+     * @param desiredCounts
+     * @param thresholdRange
+     * @param power
+     */
     public void runEncoder(DcMotor motor, int desiredCounts,  int thresholdRange, double power)
     {
         power = Math.abs(power);
@@ -286,7 +378,7 @@ public class HwMap extends LinearOpMode {
     }
     public void armMoveAndIdle(int counts, double power)
     {
-        motorRTPIdle(arm, counts, power);
+        motorRTPIdle(arm, arm.getCurrentPosition() + counts, power);
     }
     public void motorRTP(DcMotor motor, int counts, double power)
     {
@@ -304,7 +396,7 @@ public class HwMap extends LinearOpMode {
     }
     public void deliverBox(int degreesToPark, int inchesToBackUp)
     {
-        armMoveAndIdle(arm.getCurrentPosition()+850, .4); //lower arm to chassis base
+        armMoveAndIdle(850, .4); //lower arm to chassis base
         waitFor(1);
         pincerGrip();
         waitFor(1);
@@ -318,7 +410,7 @@ public class HwMap extends LinearOpMode {
             }
         }
         startExtend( 13500, .7); //start extend arm
-        encoderDriveAndMoveArm(.7, .7, 19, 5, 1); //drive to tower
+        encoderDriveAndMoveArm(.7, .7, 19, 5, 1); //drive to tower and check for arm movement and set brake
         while(opModeIsActive()&& (arm.isBusy()||extend.isBusy()))
         {
             telemetry.addData("Waiting for motors", "");
