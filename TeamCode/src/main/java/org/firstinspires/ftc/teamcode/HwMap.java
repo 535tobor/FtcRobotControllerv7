@@ -13,6 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+/**
+ * Class that contains the hardware map and code operations for linear use
+ */
 public class HwMap extends LinearOpMode {
 
     public DcMotor fl, fr, br, bl,arm , extend, carouSpin;
@@ -23,7 +26,7 @@ public class HwMap extends LinearOpMode {
     public BNO055IMU imu;
     public Orientation gyroAngles;
     public double desiredRobotHeading;
-    public final double WHEEL_DIA = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIA * 3.14);
+    public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     public ElapsedTime runtime = new ElapsedTime();
     public String side = "empty", level = "empty";
 
@@ -302,6 +305,7 @@ public class HwMap extends LinearOpMode {
     {
         return (val>( otherval + range)||val<( otherval - range));
     }
+
     /**
      * (Doubles) Sets up a range/threshold of values between ( b + number < a < b - number ) to account for hardware that cannot reach an exact value but can be stopped within a range
      * @param val value that is being compared (a)
@@ -315,11 +319,11 @@ public class HwMap extends LinearOpMode {
     }
 
     /**
-     *
-     * @param motor
-     * @param desiredCounts
-     * @param thresholdRange
-     * @param power
+     * Use encoder to power motor without Run To Position
+     * @param motor from any on the hardware map
+     * @param desiredCounts position in encoder counts
+     * @param thresholdRange increment&decrement for range of counts
+     * @param power from -1.0 to 1.0
      */
     public void runEncoder(DcMotor motor, int desiredCounts,  int thresholdRange, double power)
     {
@@ -335,20 +339,30 @@ public class HwMap extends LinearOpMode {
         motor.setPower(0);
     }
 
-    public void driveByDistance( double desired, double multiplier)
+    /**
+     * Drives the chassis autonomously using a distance sensor that calculates the current power proportional to the distance away from an object; goes from fast to slow as it approaches object.
+     * @param desiredDistanceFromObj in CM
+     * @param multiplier from 0.1 to 1.0; scales down power for motors so they never runs at full speed
+     */
+    public void driveByDistance( double desiredDistanceFromObj, double multiplier)
     {
-        double divisor = desired - dsL.getDistance(DistanceUnit.CM); //desired - initial
-        double power = .06;//start power greater than .055 so it complies with the while loop; algorithm c=
+        double divisor = desiredDistanceFromObj - dsL.getDistance(DistanceUnit.CM); //desired - initial
+        double power = .06;//start power greater than .055 so it complies with the while loop
         multiplier = Math.max(0.1, multiplier);
         multiplier = Math.min(1, multiplier);
-        while(opModeIsActive()&&threshold(dsL.getDistance(DistanceUnit.CM), desired, .3) && Math.abs(power)>.055)
+        while(opModeIsActive()&&threshold(dsL.getDistance(DistanceUnit.CM), desiredDistanceFromObj, .3) && Math.abs(power)>.055)
         {
-            power = ((dsL.getDistance(DistanceUnit.CM)-desired)/divisor)*multiplier;
+            power = ((dsL.getDistance(DistanceUnit.CM)-desiredDistanceFromObj)/divisor)*multiplier;
             setPowerAll(power);
         }
         setPowerZero();
     }
 
+    /**
+     * Increment the servo position of the servo instead of going from point a to b in one swing
+     * @param position from 0.0 to 1.0
+     * @param timeout in seconds; force quits the method if the servo is still trying to move after a certain amount of time
+     */
     public void setPincerPos(double position, double timeout)
     {
         double curPincerPos = pincer.getPosition();
@@ -365,6 +379,12 @@ public class HwMap extends LinearOpMode {
         }
     }
 
+    /**
+     * The process of using the motor object's run-to-position call and then idle so the motor is the only hardware running
+     * @param motor from any in the hardware map
+     * @param counts position in encoder counts
+     * @param power from -1.0 to 1.0
+     */
     public void motorRTPIdle(DcMotor motor, int counts, double power)
     {
 
@@ -376,31 +396,74 @@ public class HwMap extends LinearOpMode {
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+    /**
+     * motorRTPIdle specialized for the arm motor
+     * @param counts position in encoder counts
+     * @param power from -1.0 to 1.0
+     */
     public void armMoveAndIdle(int counts, double power)
     {
         motorRTPIdle(arm, arm.getCurrentPosition() + counts, power);
     }
+
+    /**
+     * Intiates the process of using the motor object's run-to-position call; will run in the backgound
+     * @param motor from any in the hardware map
+     * @param counts position in encoder counts
+     * @param power from -1.0 to 1.0
+     */
     public void motorRTP(DcMotor motor, int counts, double power)
     {
         motor.setTargetPosition(counts);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setPower(power);
     }
+
+    /**
+     * Initiates the motorRTP call specialized for the extend motor
+     * @param counts away from current position
+     * @param power from -1.0 to 1.0
+     */
     public void startExtend(int counts, double power)
     {
         motorRTP(extend, extend.getCurrentPosition() + counts, power);
     }
+
+    /**
+     * Initiates the motorRTP call specialized for the arm motor
+     * @param counts away from the arm's current position
+     * @param power from -1.0 to 1.0
+     */
     public void startArmMovement(int counts, double power)
     {
         motorRTP(arm, arm.getCurrentPosition()+ counts, power);
     }
-    public void deliverBox(int degreesToPark, int inchesToBackUp)
+
+    /**
+     * Steps to deliver preloaded cargo after intialization in Autonomous
+     * @param angleToPark in degrees; after scoring, use measurement to turn in the correct position to park
+     * @param inchesToBackUp in inches; after scoring, use measurement to back into parking position
+     */
+    public void deliverBox(int angleToPark, int inchesToBackUp)
     {
         armMoveAndIdle(850, .4); //lower arm to chassis base
         waitFor(1);
         pincerGrip();
         waitFor(1);
-        startArmMovement( arm.getCurrentPosition()-1250, -.4); //start raise arm
+        if(level.equals("Top"))
+        {
+
+        }
+        else if(level.equals("Middle"))
+        {
+
+        }
+        else
+        {
+
+        }
+        startArmMovement( -1250, -.4); //start raise arm
         runtime.reset();
         while(opModeIsActive() && runtime.time()<1) //distract flow to give time to start extend arm
         {
@@ -421,10 +484,13 @@ public class HwMap extends LinearOpMode {
         waitFor(1);
         startExtend(-10000, -.8);
         encoderDrive(-.7, -.7, 3, 5, 1);
-        robotTurn(degreesToPark, 4);
+        robotTurn(angleToPark, 4);
         encoderDrive(-.7, -.7, inchesToBackUp, 8, 1);
     }
 
+    /**
+     * Uses the distance sensors to autonomously identify what level to place the preleaoded cargo on based on where the custom scoring element is positioned
+     */
     public void barcodeDetect() {
         if (side.equals("left")) {
             if (dsL.getDistance(DistanceUnit.CM) < 60) {
@@ -447,18 +513,26 @@ public class HwMap extends LinearOpMode {
             } else {
                 level = "Top";
             }
-
         }
         telemetry.addData("Level: ", level);
     }
-    public void waitFor(double seconds)
+
+    /**
+     * "Interrupt" program for [time] amount of seconds
+     * @param time in seconds
+     */
+    public void waitFor(double time)
     {
         runtime.reset();
-        while(opModeIsActive()&& runtime.time()<seconds)
+        while(opModeIsActive()&& runtime.time()<time)
         {
             telemetry.update();
         }
     }
+
+    /**
+     * Set the power of the motor to zero and set brake
+     */
     public void armBrake()
     {
         arm.setPower(0);
