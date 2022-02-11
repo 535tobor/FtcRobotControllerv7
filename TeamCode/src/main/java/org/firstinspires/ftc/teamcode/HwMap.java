@@ -25,7 +25,7 @@ public class HwMap extends LinearOpMode {
     public double desiredRobotHeading;
     public final double WHEEL_DIA = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIA * 3.14);
     public ElapsedTime runtime = new ElapsedTime();
-    public String side = "empty";
+    public String side = "empty", level = "empty";
 
     public void initHwMap()
     {
@@ -49,10 +49,16 @@ public class HwMap extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode()  {
+    public void runOpMode()  {}
 
+    public void pincerGrip()
+    {
+        pincer.setPosition(.375);
     }
-
+    public void pincerRelease()
+    {
+        pincer.setPosition(0);
+    }
     public void spin(double time, double power)
     {
         runtime.reset();
@@ -77,25 +83,19 @@ public class HwMap extends LinearOpMode {
     }
     public void setModeAll(DcMotor.RunMode mode)
     {
-        fl.setMode(mode);
-        fr.setMode(mode);
-        bl.setMode(mode);
-        br.setMode(mode);
+        fl.setMode(mode); fr.setMode(mode); bl.setMode(mode); br.setMode(mode);
     }
     public void setPowerLeft(double power)
     {
-        fl.setPower(power);
-        bl.setPower(power);
+        fl.setPower(power); bl.setPower(power);
     }
     public void setPowerRight(double power)
     {
-        fr.setPower(power);
-        br.setPower(power);
+        fr.setPower(power); br.setPower(power);
     }
     public void setPowerAll(double power)
     {
-        setPowerLeft(power);
-        setPowerRight(power);
+        setPowerLeft(power); setPowerRight(power);
     }
     public void setPowerZero()
     {
@@ -110,42 +110,14 @@ public class HwMap extends LinearOpMode {
         setPowerZero();
     }
 
-    public void turn(int degrees, double timeout) //from current
+    public void robotTurn(int degrees, double timeoutS) //from current
     {
 
         double initAngle = getRobotAngle();
         double desiredAngle = initAngle + degrees;
         runtime.reset();
-        while(opModeIsActive()&&(runtime.time()<timeout)&&(getRobotAngle()>( desiredAngle + 2)|| getRobotAngle()<(desiredAngle- 2)))
+        while(opModeIsActive()&&(runtime.time()<timeoutS)&&(getRobotAngle()>( desiredAngle + 2)|| getRobotAngle()<(desiredAngle- 2)))
         {//left is pos
-            updateGyro();
-            if(degrees>0)
-            {
-                setPowerLeft(-.7);
-                setPowerRight(.7);
-            }
-            else
-            {
-                setPowerLeft(.7);
-                setPowerRight(-.7);
-            }
-        }
-        setPowerAll(0);
-    }
-    public void turnCond(int degrees, double timeout, boolean condition, DcMotor condMotor) //from current
-    {
-        runtime.reset();
-        double initAngle = getRobotAngle();
-        double desiredAngle = initAngle + degrees;
-        boolean done = false;
-        while(opModeIsActive()&&(runtime.time()<timeout)&&(getRobotAngle()>( desiredAngle + 2)|| getRobotAngle()<(desiredAngle- 2)))
-        {//left is pos
-            if(condition&&!done)
-            {
-                condMotor.setPower(0);
-                condMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                done = true;
-            }
             updateGyro();
             if(degrees>0)
             {
@@ -168,11 +140,11 @@ public class HwMap extends LinearOpMode {
         // reset the timeout time and start motion.
         runtime.reset();
         // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-        while ( opModeIsActive() && (runtime.seconds() < timeoutS) && (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget))
+        while ( opModeIsActive() && (runtime.seconds() < timeoutS) && (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2
+                < newLeftTarget  &&Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget))
         {
             double rem = (Math.abs(fl.getCurrentPosition())+ Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
-            double NLspeed;
-            double NRspeed;
+            double NLspeed, NRspeed;
             boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  && Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
             boolean why = (runtime.seconds() < timeoutS);
             telemetry.addData("time bool: "+why+ " cur Pos bool: ",tele);
@@ -209,7 +181,7 @@ public class HwMap extends LinearOpMode {
         // Stop all motion;
         setPowerZero();
     }
-    public void encoderDriveAndRTPMotor(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup, boolean condition, DcMotor condMotor){
+    public void encoderDriveAndMoveArm(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
         int newLeftTarget = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
         int newRightTarget= (fr.getCurrentPosition() + br.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
         boolean done = false;
@@ -219,14 +191,11 @@ public class HwMap extends LinearOpMode {
             double rem = (Math.abs(fl.getCurrentPosition())+ Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
             double NLspeed, NRspeed;
             boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  && Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
-            boolean why = (runtime.seconds() < timeoutS);
-            telemetry.addData("time bool: "+why+ " cur Pos bool: ",tele);
             telemetry.update();
 
-            if(condition&&!done)
+            if(!arm.isBusy()&&!done)
             {
-                condMotor.setPower(0);
-                condMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                armBrake();
                 done = true;
             }
 
@@ -303,6 +272,7 @@ public class HwMap extends LinearOpMode {
             pincer.setPosition(curPincerPos);
         }
     }
+
     public void motorRTPIdle(DcMotor motor, int counts, double power)
     {
 
@@ -314,69 +284,63 @@ public class HwMap extends LinearOpMode {
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-
+    public void armMoveAndIdle(int counts, double power)
+    {
+        motorRTPIdle(arm, counts, power);
+    }
     public void motorRTP(DcMotor motor, int counts, double power)
     {
         motor.setTargetPosition(counts);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setPower(power);
     }
-    public void deliverBox(ElapsedTime timer, int degreesToPark, int inchesToBackUp)
+    public void startExtend(int counts, double power)
     {
-
-        motorRTPIdle(arm, arm.getCurrentPosition()+850, .4); //lower arm to chassis base
-        sleep(1000);
-
-        pincer.setPosition(.375); // grip block
-        //setPincerPos(.375, 3);
-        timer.reset();
-        while(opModeIsActive()&& timer.time()<1)
+        motorRTP(extend, extend.getCurrentPosition() + counts, power);
+    }
+    public void startArmMovement(int counts, double power)
+    {
+        motorRTP(arm, arm.getCurrentPosition()+ counts, power);
+    }
+    public void deliverBox(int degreesToPark, int inchesToBackUp)
+    {
+        armMoveAndIdle(arm.getCurrentPosition()+850, .4); //lower arm to chassis base
+        waitFor(1);
+        pincerGrip();
+        waitFor(1);
+        startArmMovement( arm.getCurrentPosition()-1250, -.4); //start raise arm
+        runtime.reset();
+        while(opModeIsActive() && runtime.time()<1) //distract flow to give time to start extend arm
         {
-            telemetry.addData("goteem", "");
-            telemetry.update();
+            if(!arm.isBusy())
+            {
+                armBrake();
+            }
         }
-        motorRTP(arm, arm.getCurrentPosition()-1250, -.4); //start raise arm
-        //motorRTPIdle(arm, arm.getCurrentPosition()-900, -.4); //start raise arm
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        timer.reset();
-        while(opModeIsActive() && timer.time()<1) //distract flow to give time to start extend arm
-        { if(!arm.isBusy())
-        {
-            arm.setPower(0);
-            arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }
-        }
-        motorRTP(extend, extend.getCurrentPosition()+13500, .7); //start extend arm
-//            arm.setPower(0);
-//            arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //encoderDrive(.7, .7, 5, 5, 1);
-        encoderDriveAndRTPMotor(.7, .7, 19, 5, 1, !arm.isBusy(), arm); //drive to tower
+        startExtend( 13500, .7); //start extend arm
+        encoderDriveAndMoveArm(.7, .7, 19, 5, 1); //drive to tower
         while(opModeIsActive()&& (arm.isBusy()||extend.isBusy()))
         {
             telemetry.addData("Waiting for motors", "");
         }
-        arm.setPower(0);
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        sleep(1000);
-        //setPincerPos(0, 3);
-        pincer.setPosition(0); //release block
-        // robot starts angled facing tower to go straight to tower
-        sleep(1000);
-
-        motorRTP(extend, extend.getCurrentPosition()-10000, -.8);
+        armBrake();
+        waitFor(1);
+        pincerRelease();
+        waitFor(1);
+        startExtend(-10000, -.8);
         encoderDrive(-.7, -.7, 3, 5, 1);
-        turn(degreesToPark, 4);
+        robotTurn(degreesToPark, 4);
         encoderDrive(-.7, -.7, inchesToBackUp, 8, 1);
     }
 
-    public String barcodeDetect() {
+    public void barcodeDetect() {
         if (side.equals("left")) {
             if (dsL.getDistance(DistanceUnit.CM) < 60) {
-                return "Middle";
+                level =  "Middle";
             } else if (dsR.getDistance(DistanceUnit.CM) < 60) {
-                return "Bottom";
+                level = "Bottom";
             } else {
-                return "Top";
+                level = "Top";
             }
             // left         right
             // _  _  _   O  _  _  _
@@ -385,15 +349,28 @@ public class HwMap extends LinearOpMode {
             //   Mid Bot   Bot Mid 
         } else {
             if (dsL.getDistance(DistanceUnit.CM) < 60) {
-                return "Bottom";
+                level = "Bottom";
             } else if (dsR.getDistance(DistanceUnit.CM) < 60) {
-                return "Middle";
+                level = "Middle";
             } else {
-                return "Top";
+                level = "Top";
             }
 
         }
+        telemetry.addData("Level: ", level);
     }
-
+    public void waitFor(double seconds)
+    {
+        runtime.reset();
+        while(opModeIsActive()&& runtime.time()<seconds)
+        {
+            telemetry.update();
+        }
+    }
+    public void armBrake()
+    {
+        arm.setPower(0);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
 }
 

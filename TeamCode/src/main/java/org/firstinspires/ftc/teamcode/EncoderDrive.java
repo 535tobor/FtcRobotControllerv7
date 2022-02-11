@@ -27,7 +27,7 @@ public class EncoderDrive extends HwMap {
         {
             //carousel(39);
             driveByTime(-.6,.5);
-            turn(90, 5);
+            robotTurn(90, 5);
             driveByTime(.6,2);
 
             //warehousePark(-55);
@@ -36,7 +36,7 @@ public class EncoderDrive extends HwMap {
     public void warehousePark(int degrees)
     {
         encoderDrive(.8, .8, 10, 5, 1);// move forward to not run into wall
-        turn(degrees, 5);// turn towards the warehouse
+        robotTurn(degrees, 5);// turn towards the warehouse
         sleep(250);
         encoderDrive(.8, .8, 16, 7, 1);// drive into warehouse
     }
@@ -44,13 +44,13 @@ public class EncoderDrive extends HwMap {
     public void carousel(int degrees)
     {
         encoderDrive(.8, .8, 17, 5, 1);// move forward to not run into wall
-        turn(-degrees, 5);// turn towards the right so the back of the bot carou spinner is facing the carousel
+        robotTurn(-degrees, 5);// turn towards the right so the back of the bot carou spinner is facing the carousel
         sleep(1000);
         encoderDrive(-.8, -.8, 15, 7, 1);// backward towards carousel
         spin(5, .45); //spin the carousel
         //park
         encoderDrive(.8, .8, 5, 5, 1); //drive forward to move away from spinner
-        turn(degrees,5);//turn to face parking
+        robotTurn(degrees,5);//turn to face parking
         encoderDrive(.8, .8,10, 7, 1); //park
         setModeAll(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }

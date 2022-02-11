@@ -14,13 +14,14 @@ public class DeliverBoxRedDepot extends  HwMap{
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {
+            barcodeDetect();
             updateGyro();
             telemetry.addData("", pincer.getPosition());
             telemetry.update();
         }
         if(opModeIsActive())
         {
-            deliverBox(timer, -60, 32);
+            deliverBox(-60, 32);
             //if red depot:
 //            motorRTP(extend, extend.getCurrentPosition()-10000, -.7);
 //            encoderDrive(-.7, -.7, 8, 5, 1);

@@ -20,7 +20,7 @@ public class DeliverBoxRedWH extends  HwMap{
         }
         if(opModeIsActive())
         {
-            deliverBox(timer, 45, 45);
+            deliverBox(45, 45);
             //if red warehouse:
 //            motorRTP(extend, extend.getCurrentPosition()-10000, -.7);
 //            encoderDrive(-.7, -.7, 8, 5, 1);

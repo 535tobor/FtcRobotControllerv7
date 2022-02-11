@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class DeliverBoxBlueWH extends  HwMap{
     ElapsedTime timer = new ElapsedTime();
     int armCts = 0;
-    String level = "";
     @Override
     public void runOpMode()
     {
@@ -16,14 +15,14 @@ public class DeliverBoxBlueWH extends  HwMap{
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {
-            level = barcodeDetect(); // loop in initialization, keep checking
+            barcodeDetect(); // loop in initialization, keep checking; global level is set
             updateGyro();
             telemetry.addData("", pincer.getPosition());
             telemetry.update();
         }
         if(opModeIsActive())
         {
-            deliverBox(timer, -45, 45);
+            deliverBox(-45, 45);
 
             //if blue warehouse:
 //            motorRTP(extend, extend.getCurrentPosition()-10000, -.7);

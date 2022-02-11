@@ -23,7 +23,7 @@ public class BlueWarehouse extends HwMap {
             //extend.setPower(.4);
 
             driveByTime(-.6,.5);
-            turn(-90, 5);
+            robotTurn(-90, 5);
             driveByTime(.6,2);
         }
     }

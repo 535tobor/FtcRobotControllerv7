@@ -20,7 +20,7 @@ public class DeliverBoxBlueDepot extends  HwMap{
         }
         if(opModeIsActive())
         {
-            deliverBox(timer, 60, 32);
+            deliverBox(60, 32);
 
 //            //if blue depot:
 //            motorRTP(extend, extend.getCurrentPosition()-10000, -.7);
