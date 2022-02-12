@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  */
 public class HwMap extends LinearOpMode {
 
-    public DcMotor fl, fr, br, bl,arm , extend, carouSpin;
+    public DcMotor fl, fr, br, bl, arm, extend, carouSpin;
     public Servo pincer;
     public DistanceSensor dsL, dsR;
 
@@ -447,23 +447,28 @@ public class HwMap extends LinearOpMode {
      */
     public void deliverBox(int angleToPark, int inchesToBackUp)
     {
+        int armEncoderCtsBox = 0;
+        double boxDeliverDistance = 0;
         armMoveAndIdle(850, .4); //lower arm to chassis base
         waitFor(1);
         pincerGrip();
         waitFor(1);
         if(level.equals("Top"))
         {
-
+            armEncoderCtsBox = -1250;
+            boxDeliverDistance = 19;
         }
         else if(level.equals("Middle"))
         {
-
+            armEncoderCtsBox = -960;
+            boxDeliverDistance = 15;
         }
         else
         {
-
+            armEncoderCtsBox = -500;
+            boxDeliverDistance = 13;
         }
-        startArmMovement( -1250, -.4); //start raise arm
+        startArmMovement(armEncoderCtsBox, -.4); //start raise arm
         runtime.reset();
         while(opModeIsActive() && runtime.time()<1) //distract flow to give time to start extend arm
         {
@@ -473,7 +478,7 @@ public class HwMap extends LinearOpMode {
             }
         }
         startExtend( 13500, .7); //start extend arm
-        encoderDriveAndMoveArm(.7, .7, 19, 5, 1); //drive to tower and check for arm movement and set brake
+        encoderDriveAndMoveArm(.7, .7, boxDeliverDistance, 5, 1); //drive away from wall for turn
         while(opModeIsActive()&& (arm.isBusy()||extend.isBusy()))
         {
             telemetry.addData("Waiting for motors", "");
