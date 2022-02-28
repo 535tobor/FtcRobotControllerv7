@@ -2,20 +2,25 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name = "MainTele")
 
 public class MainTeleOp extends HwMapIter{
     boolean armRangeIsValid = false, extendRangeIsValid, buttonPressed=false, toggle = false;
-    double curPincerPos = 0;
-    int curArmPos;
+    double curPincerPos = 0, currentAngle = 0;
+    int curArmPos, currentEncoder;
+    boolean encoderLock = false, angleLock = false;
+    String fmtstr = "Angle to carousel: ";
+    String angletxt = "";
+    String encodertxt = "";
+    public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     @Override
     public void init()
     {
         initHwMap();
         curPincerPos = pincer.getPosition();
         curArmPos = arm.getCurrentPosition();
+        //extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //telemetry.addData("servo: ", pincer.getPosition());
         updateGyro();
     }
@@ -32,6 +37,25 @@ public class MainTeleOp extends HwMapIter{
     @Override
     public void loop()
     {
+
+        if(!encoderLock)
+        {
+            currentEncoder = (fl.getCurrentPosition()+fr.getCurrentPosition()+bl.getCurrentPosition()+br.getCurrentPosition())/4;
+        }
+        if(!angleLock)
+        {
+            currentAngle = getRoboAngle();
+        }
+        if(gamepad1.x)
+        {
+            angleLock = true;
+            angletxt = String.valueOf(currentAngle - getRoboAngle());
+        }
+        if(gamepad1.y)
+        {
+            encoderLock = true;
+            encodertxt = Math.abs(currentEncoder - ((fl.getCurrentPosition()+fr.getCurrentPosition()+bl.getCurrentPosition()+br.getCurrentPosition())/4))/COUNTS_PER_INCH + "\n";
+        }
         // controller one... driving
         if((Math.abs(gamepad1.left_stick_y)>.1)||Math.abs(gamepad1.right_stick_y)>.1)
         {
@@ -42,31 +66,39 @@ public class MainTeleOp extends HwMapIter{
         }
         else if(gamepad1.right_trigger>.1)
         {
-            fl.setPower(gamepad1.right_trigger*.5);
-            bl.setPower(gamepad1.right_trigger*.5);
-            fr.setPower(-gamepad1.right_trigger*.5);
-            br.setPower(-gamepad1.right_trigger*.5);
+            fl.setPower(gamepad1.right_trigger*.35);
+            bl.setPower(gamepad1.right_trigger*.35);
+            fr.setPower(-gamepad1.right_trigger*.35);
+            br.setPower(-gamepad1.right_trigger*.35);
         }
         else if(gamepad1.left_trigger>.1)
         {
-            fl.setPower(-gamepad1.left_trigger*.5);
-            bl.setPower(-gamepad1.left_trigger*.5);
-            fr.setPower(gamepad1.left_trigger*.5);
-            br.setPower(gamepad1.left_trigger*.5);
+            fl.setPower(-gamepad1.left_trigger*.35);
+            bl.setPower(-gamepad1.left_trigger*.35);
+            fr.setPower(gamepad1.left_trigger*.35);
+            br.setPower(gamepad1.left_trigger*.35);
         }
-        else if (gamepad1.x)
+//        else if (gamepad1.x)
+//        {
+//            fl.setPower(-1);
+//            bl.setPower(-1);
+//            fr.setPower(1);
+//            br.setPower(1);
+//        }
+//        else if(gamepad1.b)
+//        {
+//            fl.setPower(1);
+//            bl.setPower(1);
+//            fr.setPower(-1);
+//            br.setPower(-1);
+//        }
+        else if(gamepad1.dpad_up)
         {
-            fl.setPower(-1);
-            bl.setPower(-1);
-            fr.setPower(1);
-            br.setPower(1);
+            setPowerAll(.5);
         }
-        else if(gamepad1.b)
+        else if(gamepad1.dpad_down)
         {
-            fl.setPower(1);
-            bl.setPower(1);
-            fr.setPower(-1);
-            br.setPower(-1);
+            setPowerAll(-.5);
         }
         else {
 
@@ -78,7 +110,7 @@ public class MainTeleOp extends HwMapIter{
         //  controller two... arm/claw/carouspinner
 
         if(gamepad2.left_bumper) {
-            carouSpin.setPower(.55);
+            carouSpin.setPower(.42);
         }
         else if(gamepad2.right_bumper) {
             carouSpin.setPower(-.55);
@@ -86,22 +118,30 @@ public class MainTeleOp extends HwMapIter{
         else{
             carouSpin.setPower(0);
         }
-        if(gamepad2.left_stick_y<0)//&&extend.getCurrentPosition()<15600)
+        if(gamepad2.left_stick_y<0&&extend.getCurrentPosition()<9000)
         {
             extend.setPower(1);
         }
-        else if(gamepad2.left_stick_y>0)//&&extend.getCurrentPosition()>0)
+        else if(gamepad2.left_stick_y>0&&extend.getCurrentPosition()>2000)
         {
             extend.setPower(-1);
+        }
+        else if(gamepad2.left_stick_y>0&&extend.getCurrentPosition()<2000&&extend.getCurrentPosition()>10)
+        {
+            extend.setPower(-.5);
+        }
+        else if(gamepad2.left_stick_y<0&&(extend.getCurrentPosition()<10400))
+        {
+            extend.setPower(.5);
         }
         else{
             extend.setPower(0);
         }
-        if(gamepad2.right_stick_y<0)//&&arm.getCurrentPosition()>0)
+        if(gamepad2.right_stick_y<0)
         {
             arm.setPower(-.4);
         }
-        else if(gamepad2.right_stick_y>0)//&&arm.getCurrentPosition()<1555)
+        else if(gamepad2.right_stick_y>0)
         {
             arm.setPower(.4);
         }
@@ -130,14 +170,16 @@ public class MainTeleOp extends HwMapIter{
             curPincerPos-=.014;//.005;
             pincer.setPosition(curPincerPos);
         }
-        curPincerPos = Math.max(0, curPincerPos);
-        curPincerPos = Math.min(.375, curPincerPos);
+//        curPincerPos = Math.max(0, curPincerPos);
+//        curPincerPos = Math.min(.45, curPincerPos);
 
-        telemetry.addData("current servo position: ", pincer.getPosition());
-        //telemetry.addData("arm encoder counts: ", arm.getCurrentPosition());
+        telemetry.addData(fmtstr, angletxt);
+        telemetry.addData("Encoder Inches to position: ", encodertxt);
+//        telemetry.addData("current servo position: ", pincer.getPosition());
+//        telemetry.addData("arm encoder counts: ", arm.getCurrentPosition());
         //telemetry.addData("extend encoder counts: ", extend.getCurrentPosition());
-        telemetry.addData("Ds: ", dsL.getDistance(DistanceUnit.CM));
-        telemetry.addData("Ds2: ", dsR.getDistance(DistanceUnit.CM));
+//        telemetry.addData("Ds: ", dsL.getDistance(DistanceUnit.CM));
+//        telemetry.addData("DsBR: ", dsBR.getDistance(DistanceUnit.CM));
         telemetry.update();
 
     }

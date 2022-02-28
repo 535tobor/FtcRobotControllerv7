@@ -14,24 +14,20 @@ public class DeliverBoxRedWH extends  HwMap{
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {
+            runtime.reset();
+            while(runtime.time()<3)
+            {
+                distanceArrayAverage();
+                break;
+            }
+            barcodeDetect();
             updateGyro();
-            telemetry.addData("", pincer.getPosition());
             telemetry.update();
         }
         if(opModeIsActive())
         {
-            deliverBox(45, 45);
-            //if red warehouse:
-//            motorRTP(extend, extend.getCurrentPosition()-10000, -.7);
-//            encoderDrive(-.7, -.7, 8, 5, 1);
-//            turn(45, 4);
-//            encoderDrive(-.7, -.7, 25, 6, 1);
-            /*
-                    - back up for a few seconds or inches to get arm out of way
-                    - turn so back of robot is facing the warehouse
-                    - back into parking
-             */
 
+            deliverBox();
         }
     }
 }

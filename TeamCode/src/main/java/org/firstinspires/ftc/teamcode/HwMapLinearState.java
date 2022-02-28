@@ -18,20 +18,19 @@ import java.util.ArrayList;
 /**
  * Class that contains the hardware map and code operations for linear use
  */
-public class HwMap extends LinearOpMode {
+public class HwMapLinearState extends LinearOpMode {
 
-    public DcMotor fl, fr, br, bl, arm, extend, carouSpin;
-    public Servo pincer;
+    public DcMotor fl, fr, br, bl, carouselSpinner, intakeL, intakeR, extender;
     public DistanceSensor dsL, dsR, dsBR;
+    public Servo basket, turnExtender;
 
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
-    public double desiredRobotHeading, averageL = 0, averageR = 0;
+    public double desiredRobotHeading;
     public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     public ElapsedTime runtime = new ElapsedTime();
-    public String side = "empty", level = "empty";
-    public ArrayList<Double> DsLValues = new ArrayList<Double>(), DsRValues = new ArrayList<Double>();
+    public String side = "empty";
 
     /**
      * Sets up hardware map for chassis and other mechanisms
@@ -44,13 +43,14 @@ public class HwMap extends LinearOpMode {
         br = hardwareMap.dcMotor.get("br");
         fl.setDirection(DcMotor.Direction.REVERSE);
         bl.setDirection(DcMotor.Direction.REVERSE);
-        carouSpin = hardwareMap.dcMotor.get("carousel");
-        arm = hardwareMap.dcMotor.get("arm");
-        extend = hardwareMap.dcMotor.get("extender");
-        pincer = hardwareMap.servo.get("pincer");
+        carouselSpinner = hardwareMap.dcMotor.get("carousel");
         dsL = hardwareMap.get(DistanceSensor.class, "ds"); //left
         dsR = hardwareMap.get(DistanceSensor.class, "ds2"); //right
         dsBR = hardwareMap.get(DistanceSensor.class, "dsBR");
+        basket = hardwareMap.servo.get("basket");
+        turnExtender = hardwareMap.servo.get("turn");
+        extender = hardwareMap.dcMotor.get("extender");
+
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -61,34 +61,18 @@ public class HwMap extends LinearOpMode {
     @Override
     public void runOpMode()  {}
 
-    /**
-     * Sets pincer servo position to closed, or gripped
-     */
-    public void pincerGrip()
-    {
-        pincer.setPosition(.375);
-    }
-
-    /**
-     * Sets pincer servo position to open, or released
-     */
-    public void pincerRelease()
-    {
-        pincer.setPosition(0);
-    }
 
     /**
      * Powers the carousel spinning motor for a variable amount of time
      * @param time in seconds
-     * @param power from -1.0 to 1.0
      */
-    public void spin(double time, double power)
+    public void spin(double time)
     {
         runtime.reset();
         while (opModeIsActive()&& runtime.time() < time){
-            carouSpin.setPower(power);
+            carouselSpinner.setPower(.42);
         }
-        carouSpin.setPower(0);
+        carouselSpinner.setPower(0);
     }
 
     /**
@@ -170,19 +154,19 @@ public class HwMap extends LinearOpMode {
 
     /**
      * Drive and change the orientation of the robot based on the IMU gyro
-     * @param degrees from current angle
+     * @param desiredDegrees from current angle
      * @param timeoutS in seconds and used to force stop the method; timeout
      */
-    public void robotTurn(int degrees, double timeoutS) //from current
+    public void robotTurn(double desiredDegrees, double timeoutS) //from current
     {
 
         double initAngle = getRobotAngle();
-        double desiredAngle = initAngle + degrees;
+        double desiredAngle = initAngle + desiredDegrees;
         runtime.reset();
-        while(opModeIsActive()&&(runtime.time()<timeoutS)&&(getRobotAngle()>( desiredAngle + 2)|| getRobotAngle()<(desiredAngle- 2)))
+        while(opModeIsActive()&&(runtime.time()<timeoutS)&&(threshold(getRobotAngle(), desiredAngle, 2)))
         {//left is pos
             updateGyro();
-            if(degrees>0)
+            if(desiredDegrees>0)
             {
                 setPowerLeft(-.7);
                 setPowerRight(.7);
@@ -193,7 +177,29 @@ public class HwMap extends LinearOpMode {
                 setPowerRight(-.7);
             }
         }
-        setPowerAll(0);
+        setPowerZero();
+    }
+
+    public void robotTurnToAngle(int degrees, double timeoutS)
+    {
+        double power = .06;
+        int multiplierL = 1, multiplierR = -1;
+        double divisor = degrees - getRobotAngle(); //desired - initial
+        if(getRobotAngle()>degrees)
+        {
+            multiplierL = -1;
+            multiplierR = 1;
+        }
+        runtime.reset();
+        while(opModeIsActive()&&threshold(getRobotAngle(), degrees, 2) && Math.abs(power)>.055&&(runtime.time()<timeoutS));
+        {
+            updateGyro();
+            power = (getRobotAngle()-degrees)/divisor; // (current - desired) / desired - initial
+            setPowerLeft(power*multiplierL);
+            setPowerRight(power*multiplierR);
+        }
+        setPowerZero();
+
     }
 
     /**
@@ -253,52 +259,6 @@ public class HwMap extends LinearOpMode {
     }
 
     /**
-     * Drives the chassis autonomously using the encoderDrive algorithm and continues the run to position movement of the arm motor until it stops and then sets its brake
-     * @param Lspeed from -1.0 to 1.0
-     * @param Rspeed from -1.0 to 1.0
-     * @param Inches the robot moves this increment
-     * @param timeoutS in seconds and used to force stop the method; timeout
-     * @param rampup increment used to "Slowly" ramp the motors up over time
-     */
-    public void encoderDriveAndMoveArm(double Lspeed, double Rspeed, double Inches, double timeoutS, double rampup){
-        int newLeftTarget = (fl.getCurrentPosition() + bl.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
-        int newRightTarget= (fr.getCurrentPosition() + br.getCurrentPosition() )/2 + (int)(Inches * COUNTS_PER_INCH);
-        boolean done = false;
-        runtime.reset();
-        while ( opModeIsActive() && (runtime.seconds() < timeoutS) && (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  &&Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget))
-        {
-            double rem = (Math.abs(fl.getCurrentPosition())+ Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
-            double NLspeed, NRspeed;
-            boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  && Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
-            telemetry.update();
-
-            if(!arm.isBusy()&&!done)
-            {
-                armBrake();
-                done = true;
-            }
-
-            double R = runtime.seconds();
-            if (R < rampup) {
-                double ramp = R / rampup; NLspeed = Lspeed * ramp; NRspeed = Rspeed * ramp;
-            }
-            else if(rem > (2000) )
-            {
-                NLspeed = Lspeed; NRspeed = Rspeed;
-            }
-            else if(rem > (400) && (Lspeed*.2) > .1 && (Rspeed*.2) > .1) {
-                NLspeed = Lspeed * (rem / 2000); NRspeed = Rspeed * (rem / 2000);
-            }
-            else {
-                NLspeed = Lspeed * .2; NRspeed = Rspeed * .2;
-            }
-            setPowerLeft(NLspeed);
-            setPowerRight(NRspeed);
-        }
-        setPowerZero();
-    }
-
-    /**
      * (Integers) Sets up a range/threshold of values between ( b + number < a < b - number ) to account for hardware that cannot reach an exact value but can be stopped within a range
      * @param val value that is being compared (a)
      * @param otherval secondary comparison variable (b)
@@ -345,46 +305,10 @@ public class HwMap extends LinearOpMode {
     }
 
     /**
-     * Drives the chassis autonomously using a distance sensor that calculates the current power proportional to the distance away from an object; goes from fast to slow as it approaches object.
-     * @param desiredDistanceFromObj in CM
-     * @param multiplier from 0.1 to 1.0; scales down power for motors so they never runs at full speed
-     */
-    public void driveByDistanceBack(double desiredDistanceFromObj, double multiplier, int timeout)
-    {
-        double divisor = desiredDistanceFromObj - dsBR.getDistance(DistanceUnit.CM); //desired - initial
-        double power = .06;//start power greater than .055 so it complies with the while loop
-        multiplier = Math.max(0.1, multiplier);
-        multiplier = Math.min(1, multiplier);
-        runtime.reset();
-        while(opModeIsActive()&&threshold(dsBR.getDistance((DistanceUnit.CM)), desiredDistanceFromObj, .3) && Math.abs(power)>.055&&runtime.time()<timeout)
-        {
-
-            power = ((dsBR.getDistance(DistanceUnit.CM)-desiredDistanceFromObj)/divisor)*multiplier;
-            setPowerAll(power);
-        }
-        setPowerZero();
-    }
-
-    /**
      * Increment the servo position of the servo instead of going from point a to b in one swing
      * @param position from 0.0 to 1.0
      * @param timeout in seconds; force quits the method if the servo is still trying to move after a certain amount of time
      */
-    public void setPincerPos(double position, double timeout)
-    {
-        double curPincerPos = pincer.getPosition();
-        int multiplier = 1;
-        if(curPincerPos>position)
-        {
-            multiplier = -1;
-        }
-        runtime.reset();
-        while(opModeIsActive()&&threshold(curPincerPos, position, .01)&&runtime.time()<timeout)
-        {
-            curPincerPos+=(multiplier*.014);
-            pincer.setPosition(curPincerPos);
-        }
-    }
 
     /**
      * The process of using the motor object's run-to-position call and then idle so the motor is the only hardware running
@@ -404,16 +328,6 @@ public class HwMap extends LinearOpMode {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    /**
-     * motorRTPIdle specialized for the arm motor
-     * @param counts position in encoder counts
-     * @param power from -1.0 to 1.0
-     */
-    public void armMoveAndIdle(int counts, double power)
-    {
-        motorRTPIdle(arm, arm.getCurrentPosition() + counts, power);
-        armBrake();
-    }
 
     /**
      * Intiates the process of using the motor object's run-to-position call; will run in the backgound
@@ -429,150 +343,58 @@ public class HwMap extends LinearOpMode {
     }
 
     /**
-     * Initiates the motorRTP call specialized for the extend motor
-     * @param counts away from current position
-     * @param power from -1.0 to 1.0
-     */
-    public void startExtend(int counts, double power)
-    {
-        motorRTP(extend, extend.getCurrentPosition() + counts, power);
-    }
-
-    /**
-     * Initiates the motorRTP call specialized for the arm motor
-     * @param counts away from the arm's current position
-     * @param power from -1.0 to 1.0
-     */
-    public void startArmMovement(int counts, double power)
-    {
-        motorRTP(arm, arm.getCurrentPosition()+ counts, power);
-    }
-
-    /**
      * Steps to deliver preloaded cargo after intialization in Autonomous
      */
     public void deliverBox()
     {
-        int armEncoderCtsBox = 0, towerDegrees = -22, extendCts = 8230, multiplier = 1;
-        double boxDeliverDistance = 0;
+        int extendCts = 8230, multiplier = 1;
+        double boxDeliverDistance = 0, turnExtenderPosition = 0.5;
 
+        turnExtender.setPosition(turnExtenderPosition); //turn the extender out of the way of the wheels
+        motorRTPIdle(extender, extendCts, 1); // extender to tower
+        basket.setPosition(.7); //open basket to release piece
+        waitFor(.75);
+        basket.setPosition(.4); //close basket may be redundant
+        motorRTP(extender,-extendCts, -1);// start extender back
+        encoderDrive(.7, .7, 8, 5, 1); // drive forward for any turning being done later
+    }
+
+    public void deliverBoxParkWH()
+    {//drive to the warehouse and near the exit into the shipping hub
+        double degreesToFaceWH = 90;
+        int multiplier = 1;
+        deliverBox(); //deliver box while robot is angled towards tower and stationary, then drive a few inches forward
         if(side.equals("right"))
         {
-            multiplier=-1;
+            multiplier = -1;
         }
-        //armMoveAndIdle(850, .4); //lower arm to chassis base
-        //waitFor(1);
-        pincerGrip();
-        waitFor(1);
-        if(level.equals("Top"))
-        {
-            armEncoderCtsBox = -1050;
-            boxDeliverDistance = 16;
-            extendCts = 8000;
-        }
-        else if(level.equals("Middle"))
-        {
-            armEncoderCtsBox = -660;
-            boxDeliverDistance = 14;
-            extendCts = 7800;
-        }
-        else
-        {
-            armEncoderCtsBox = -270;
-            boxDeliverDistance = 14;
-            towerDegrees = -30;
-        }
-        towerDegrees*=multiplier;
-        armMoveAndIdle(armEncoderCtsBox, -.4); //start raise arm
-        armBrake();
-        //startExtend( 7000, .7); //start extend arm
+        robotTurn(degreesToFaceWH*multiplier, 4); //turn to face the warehouse back wall
+        encoderDrive(.9,.9, 28, 5, 1); // drive towards the wall
+        robotTurn(-degreesToFaceWH*multiplier, 4);// turn to face the shipping hub
 
-
-        encoderDrive(.7, .7, 8, 5, 1); //drive away from wall for turn
-        robotTurn(towerDegrees,3);
-
-        encoderDrive(.7,.7, boxDeliverDistance, 7, 1);
-
-        runEncoder(extend,extendCts,100,.7 );
-
-        waitFor(1);
-        pincerRelease();
-        waitFor(1);
-        if(level.equals("Bottom"))
-        {
-            armMoveAndIdle(-250, -.4);
-        }
-        startExtend(-(extendCts-200), -.8); //retract arm
-        encoderDrive(-.7, -.7, boxDeliverDistance-6, 5, 1);
-        while(opModeIsActive()&&extend.isBusy())
-        {
-
-            telemetry.addData("Waiting for motors", "");
-            telemetry.update();
-        }
-        extend.setPower(0);
     }
-//    public void deliverBoxPark(int inchesToBackUp)
-//    {
-//        int angleToPark = 45;
-//        if(side.equals("left"))
-//        {
-//            angleToPark = -45;
-//        }
-//        deliverBox(angleToPark);
-//        encoderDrive(-.7, -.7, inchesToBackUp, 8, 1);
-//    }
-//    public void deliverBoxCarousel()
-//    {
-//        int multiplier = 1, dsVal = 50, angleToPark = -50;
-//        if(side.equals("right"))
-//        {
-//            multiplier=-1;
-//            dsVal = 30;
-//            angleToPark = 45;
-//        }
-//        deliverBox(angleToPark); //deliver the box and turn to face carousel spinner
-//        if(side.equals("right"))
-//        {
-//            encoderDrive(-.7,-.7, 35, 5, 2);
-//            robotTurn(-80, 3);
-//        }
-//        driveByDistanceBack(dsVal, .43,6);
-//        runtime.reset();
-//        while (opModeIsActive()&&runtime.time()<4)
-//        {
-//            carouSpin.setPower(.55*multiplier);
-//        }
-//        carouSpin.setPower(0);
-//    }
 
-    /**
-     * Uses the distance sensors to autonomously identify what level to place the preleaoded cargo on based on where the custom scoring element is positioned
-     */
-    public void barcodeDetect() {
-        if (side.equals("left")) {
-            if (averageL < 60) {
-                level =  "Middle";
-            } else if (averageR < 60) {
-                level = "Bottom";
-            } else {
-                level = "Top";
-            }
-            // left         right
-            // _  _  _   O  _  _  _
-            //    ^  ^      ^  ^
-            //    L  R      L  R
-            //   Mid Bot   Bot Mid 
-        } else {
-            if (averageL < 60) {
-                level = "Bottom";
-            } else if (averageR < 60) {
-                level = "Middle";
-            } else {
-                level = "Top";
-            }
+    public void deliverBoxCarousel()
+    {// move and turn to park in the depot
+        double degreesToFaceWH = 90;
+        int multiplier = 1;
+        deliverBox(); //deliver box while robot is angled towards tower and stationary, then drive a few inches forward
+        if(side.equals("right"))
+        {
+            multiplier = -1;
         }
-        telemetry.addData("Level: ", level);
+        robotTurn(degreesToFaceWH*multiplier, 4); //turn so back of robot is facing the carousel
+        //back into carousel using distance sensor and maybe encoders too
+
+        spin(2); // spin the carousel
+        encoderDrive(.7,.7,7, 3,1);// drive a little bit forward so robot can turn
+
+        robotTurn(-degreesToFaceWH*multiplier, 4);// turn towards the depot
+        encoderDrive(.8,.8,20,5,1);//drive to park in depot
+
+
+
+
     }
 
     /**
@@ -588,36 +410,6 @@ public class HwMap extends LinearOpMode {
         }
     }
 
-    /**
-     * Set the power of the motor to zero and set brake
-     */
-    public void armBrake()
-    {
-        arm.setPower(0);
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    }
-
-    /**
-     * Use feedback from the distance sensors to calculate the average distance from the object within an amount of iterations using an array; used to counteract overloading sensor
-     */
-    public void distanceArrayAverage()
-    {//moving average
-        int length = 50;
-        for(int i = 0; i<=length;i++)
-        {
-            DsLValues.add(dsL.getDistance(DistanceUnit.CM));
-            DsRValues.add(dsR.getDistance(DistanceUnit.CM));
-        }
-        for(int j = 0; j<=length;j++)
-        {
-           averageL += DsLValues.get(j);
-           averageR += DsRValues.get(j);
-        }
-        averageL /=length;
-        averageR /=length;
-        DsLValues.clear();
-        DsRValues.clear();
-    }
     public double backDistanceArrayAverage()
     {
         int length = 20;
@@ -633,6 +425,27 @@ public class HwMap extends LinearOpMode {
         }
         average /=length;
         return average;
+    }
+
+    /**
+     * Drives the chassis autonomously using a distance sensor that calculates the current power proportional to the distance away from an object; goes from fast to slow as it approaches object.
+     * @param desiredDistanceFromObj in CM
+     * @param multiplier from 0.1 to 1.0; scales down power for motors so they never runs at full speed
+     */
+    public void driveByDistanceBack(double desiredDistanceFromObj, double multiplier, int timeout)
+    {
+        double divisor = desiredDistanceFromObj - dsBR.getDistance(DistanceUnit.CM); //desired - initial
+        double power = .06;//start power greater than .055 so it complies with the while loop
+        multiplier = Math.max(0.1, multiplier);
+        multiplier = Math.min(1, multiplier);
+        runtime.reset();
+        while(opModeIsActive()&&threshold(dsBR.getDistance((DistanceUnit.CM)), desiredDistanceFromObj, 1) && Math.abs(power)>.055&&runtime.time()<timeout)
+        {
+
+            power = ((dsBR.getDistance(DistanceUnit.CM)-desiredDistanceFromObj)/divisor)*multiplier;
+            setPowerAll(power);
+        }
+        setPowerZero();
     }
 
 }

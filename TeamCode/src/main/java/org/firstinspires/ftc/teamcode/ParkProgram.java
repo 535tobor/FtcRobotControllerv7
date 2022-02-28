@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="Park")
-@Disabled
+//@Disabled
 public class ParkProgram extends HwMap {
 
 
@@ -20,7 +19,8 @@ public class ParkProgram extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            driveByTime(.7, 5);
+            pincerGrip();
+            driveByTime(.7, 3);
             //turn(90, 5);
             //driveByTime(.5, 1.5);
         }

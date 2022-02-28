@@ -11,19 +11,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 @Disabled
-public class HwMapIter extends OpMode {
+public class HwMapIterState extends OpMode {
     @Override
     public void init() {
 
     }
-    public DcMotor fl, fr, br, bl, arm, extend, carouSpin;
+    public DcMotor fl, fr, br, bl, carouSpin;
+    DcMotor intakeL, intakeR;
     public Servo pincer;
     public DistanceSensor dsL, dsR, dsBR;
     public int rotations = 0;
     public BNO055IMU imu;
     public Orientation gyroAngles;
     public double desiredRobotHeading;
+    public boolean isIntakeRunning = false;
+
     public void initHwMap(){
         fl = hardwareMap.dcMotor.get("fl");
         fr = hardwareMap.dcMotor.get("fr");
@@ -31,12 +35,11 @@ public class HwMapIter extends OpMode {
         br = hardwareMap.dcMotor.get("br");
         carouSpin = hardwareMap.dcMotor.get("carousel");
         pincer = hardwareMap.servo.get("pincer");
-        arm = hardwareMap.dcMotor.get("arm");
-        arm = hardwareMap.dcMotor.get("arm");
         dsL = hardwareMap.get(DistanceSensor.class, "ds");
         dsBR = hardwareMap.get(DistanceSensor.class, "dsBR");
         dsR = hardwareMap.get(DistanceSensor.class, "ds2");
-        extend = hardwareMap.dcMotor.get("extender");
+        intakeL = hardwareMap.dcMotor.get("intakeL");
+        intakeR = hardwareMap.dcMotor.get("intakeR");
 
         //test bot reverse statements
         //fr.setDirection(DcMotor.Direction.REVERSE);
@@ -93,5 +96,21 @@ public class HwMapIter extends OpMode {
     public boolean threshold(int val, int otherval, int range)
     {
         return (val>( otherval + range)||val<( otherval - range));
+    }
+    public void launch(){
+        intakeL.setPower(-1);
+        intakeR.setPower(1);
+        isIntakeRunning = true;
+    }
+    public void reverseLaunch()
+    {
+        intakeL.setPower(1);
+        intakeR.setPower(-1);
+        isIntakeRunning = true;
+    }
+    public void launchSetZero(){
+        intakeL.setPower(0);
+        intakeR.setPower(0);
+        isIntakeRunning = false;
     }
 }
