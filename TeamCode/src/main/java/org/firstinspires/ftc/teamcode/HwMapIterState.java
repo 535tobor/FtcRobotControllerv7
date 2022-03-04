@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,14 +19,17 @@ public class HwMapIterState extends OpMode {
     public void init() {
 
     }
-    public DcMotor fl, fr, br, bl, carouSpin;
-    DcMotor intakeL, intakeR;
-    public Servo pincer;
-    public DistanceSensor dsL, dsR, dsBR;
+    public DcMotor fl, fr, br, bl, carouSpin, extender, intakeL, intakeR;
+    public Servo basket;
+    public CRServo turnExtender;
+    public DistanceSensor dsL, dsR, dsBR, dsTurn;
+
     public int rotations = 0;
+
     public BNO055IMU imu;
     public Orientation gyroAngles;
     public double desiredRobotHeading;
+
     public boolean isIntakeRunning = false;
 
     public void initHwMap(){
@@ -34,12 +38,17 @@ public class HwMapIterState extends OpMode {
         bl = hardwareMap.dcMotor.get("bl");
         br = hardwareMap.dcMotor.get("br");
         carouSpin = hardwareMap.dcMotor.get("carousel");
-        pincer = hardwareMap.servo.get("pincer");
+        intakeR = hardwareMap.dcMotor.get("intakeR");
+        intakeL = hardwareMap.dcMotor.get("intakeL");
+        extender = hardwareMap.dcMotor.get("extender");
+
+        basket = hardwareMap.servo.get("basket");
+        turnExtender = hardwareMap.get(CRServo.class,"turnEx");
+
         dsL = hardwareMap.get(DistanceSensor.class, "ds");
         dsBR = hardwareMap.get(DistanceSensor.class, "dsBR");
         dsR = hardwareMap.get(DistanceSensor.class, "ds2");
-        intakeL = hardwareMap.dcMotor.get("intakeL");
-        intakeR = hardwareMap.dcMotor.get("intakeR");
+        dsTurn = hardwareMap.get(DistanceSensor.class, "dst");
 
         //test bot reverse statements
         //fr.setDirection(DcMotor.Direction.REVERSE);
@@ -83,9 +92,17 @@ public class HwMapIterState extends OpMode {
     }
     public void setPowerAll(double power)
     {
+        setPowerLeft(power);
+        setPowerRight(power);
+    }
+    public void setPowerLeft(double power)
+    {
         fl.setPower(power);
-        fr.setPower(power);
         bl.setPower(power);
+    }
+    public void setPowerRight(double power)
+    {
+        fr.setPower(power);
         br.setPower(power);
     }
     public void setPowerZero()

@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "MainTele")
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+@TeleOp(name = "MainTeleState")
 
 public class MainTeleOpState extends HwMapIterState{
     boolean intakeCanToggle = true, intakeToggle = false, reverseIntakeCanToggle = true, reverseIntakeToggle = false;
+    boolean basketCanToggle = true, basketToggle = false, distanceThreshold = false;
+
+    ElapsedTime timer = new ElapsedTime();
     public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     @Override
     public void init()
@@ -27,32 +33,26 @@ public class MainTeleOpState extends HwMapIterState{
     public void loop()
     {
         // controller one... driving
-        if((Math.abs(gamepad1.left_stick_y)>.1)||Math.abs(gamepad1.right_stick_y)>.1)
+        if((Math.abs(gamepad1.left_stick_y)>.1)||Math.abs(gamepad1.right_stick_y)>.1) //drive with both joysticks
         {
-            fl.setPower(-gamepad1.left_stick_y);
-            bl.setPower(-gamepad1.left_stick_y);
-            fr.setPower(-gamepad1.right_stick_y);
-            br.setPower(-gamepad1.right_stick_y);
+            setPowerLeft(-gamepad1.left_stick_y);
+            setPowerRight(-gamepad1.right_stick_y);
         }
-        else if(gamepad1.right_trigger>.1)
+        else if(gamepad1.right_trigger>.1) //slow turn left
         {
-            fl.setPower(gamepad1.right_trigger*.35);
-            bl.setPower(gamepad1.right_trigger*.35);
-            fr.setPower(-gamepad1.right_trigger*.35);
-            br.setPower(-gamepad1.right_trigger*.35);
+            setPowerLeft(gamepad1.right_trigger*.35);
+            setPowerRight(-gamepad1.right_trigger*.35);
         }
-        else if(gamepad1.left_trigger>.1)
+        else if(gamepad1.left_trigger>.1)// slow turn right
         {
-            fl.setPower(-gamepad1.left_trigger*.35);
-            bl.setPower(-gamepad1.left_trigger*.35);
-            fr.setPower(gamepad1.left_trigger*.35);
-            br.setPower(gamepad1.left_trigger*.35);
+            setPowerLeft(-gamepad1.left_trigger*.35);
+            setPowerRight(gamepad1.left_trigger*.35);
         }
-        else if(gamepad1.dpad_up)
+        else if(gamepad1.dpad_up) //slow drive forwards
         {
             setPowerAll(.5);
         }
-        else if(gamepad1.dpad_down)
+        else if(gamepad1.dpad_down) // slow drive backwards
         {
             setPowerAll(-.5);
         }
@@ -67,60 +67,40 @@ public class MainTeleOpState extends HwMapIterState{
 
         if(gamepad2.left_bumper) {
             carouSpin.setPower(.42);
-        }
+        } //carousel spinner left
         else if(gamepad2.right_bumper) {
-            carouSpin.setPower(-.55);
-        }
+            carouSpin.setPower(-.42);
+        } // carousel spinner right
         else{
             carouSpin.setPower(0);
         }
 
-        if(gamepad2.x)
-        {
-            if(intakeCanToggle) //make sure that the code doesn't just toggle the thing every iteration as long as the x is held
-            {
-                intakeCanToggle=false;
-                //if the launcher is currently running, run this code to turn it off:
-                if(intakeToggle)
-                {
-                    launchSetZero(); //turn off the launcher motor
-                    intakeToggle=false; //remember that the launcher motor has been turned off
-                }
-                //if the launcher isn't currently running, run this code to turn it on:
-                else
-                {
-                    launch(); //turn on the launcher motor
-                    intakeToggle=true; //remember that the launcher motor has been turned on
-                }
-            }
+        if(gamepad2.dpad_right) {  basket.setPosition(.2); }
+        else if(gamepad2.dpad_up) { basket.setPosition(.4); }
+        else if(gamepad2.dpad_left) { basket.setPosition(.7); }
+
+        if(gamepad2.b&&distanceThreshold(4,22)) { turnExtender.setPower(1); }// change threshold to handle overshooting; clockwise
+        else if(gamepad2.a&&distanceThreshold(4,22)) { turnExtender.setPower(-1); }//counterclockwise
+        else { turnExtender.setPower(0); }
+
+        extender.setPower(gamepad2.left_stick_y);
+
+        if(gamepad2.x&&intakeCanToggle) {
+            intakeCanToggle=false;
+            if(intakeToggle) { launchSetZero(); intakeToggle=false; }
+            else{ launch(); intakeToggle=true; }
         }
-        else
+        else { intakeCanToggle=true; }
+
+        if( gamepad2.y&& reverseIntakeCanToggle)
         {
-            intakeCanToggle=true;
+            reverseIntakeCanToggle=false;
+            if(reverseIntakeToggle){ launchSetZero(); reverseIntakeToggle=false; }
+            else{ reverseLaunch();  reverseIntakeToggle=true; }
         }
-        if( gamepad2.y)
-        {
-            if(reverseIntakeCanToggle) //make sure that the code doesn't just toggle the thing every iteration as long as the x is held
-            {
-                reverseIntakeCanToggle=false;
-                //if the launcher is currently running, run this code to turn it off:
-                if(reverseIntakeToggle)
-                {
-                    launchSetZero(); //turn off the launcher motor
-                    reverseIntakeToggle=false; //remember that the launcher motor has been turned off
-                }
-                //if the launcher isn't currently running, run this code to turn it on:
-                else
-                {
-                    reverseLaunch(); //turn on the launcher motor
-                    reverseIntakeToggle=true; //remember that the launcher motor has been turned on
-                }
-            }
-        }
-        else
-        {
-            reverseIntakeCanToggle = true;
-        }
+        else { reverseIntakeCanToggle = true; }
+
+        telemetry.addData("distance: ", dsBR.getDistance(DistanceUnit.CM));
 
         telemetry.update();
 
@@ -130,4 +110,35 @@ public class MainTeleOpState extends HwMapIterState{
     {
 
     }
+
+
+    public boolean distanceThreshold(double distanceLBound, double distanceRBound)
+    {
+        return(dsTurn.getDistance(DistanceUnit.CM)>distanceLBound&&dsTurn.getDistance(DistanceUnit.CM)<distanceRBound);
+    }
+
+//    public boolean timeBoolControl = false;
+//    public double initTime = 0;
+//    public ArrayList<Boolean> timeControls = new ArrayList<>();
+//    public void timerMotorPow(boolean gamepad, double desiredTime, DcMotor motor, double power)
+//    {
+//        if(!timeBoolControl)
+//        {
+//            timeBoolControl = gamepad;
+//            initTime = getRuntime();
+//        }
+//        else
+//        {
+//            if(getRuntime()<initTime+desiredTime)
+//            {
+//                motor.setPower(power);
+//            }
+//            else
+//            {
+//                extender.setPower(0);
+//                timeBoolControl = false;
+//            }
+//
+//        }
+//    }
 }

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+    <Robot type="FirstInspires-FTC">
+
+
+    <LynxUsbDevice parentModuleAddress="173" serialNumber="(embedded)" name="Control Hub Portal">
+
+
+    <LynxModule name="Expansion Hub 3" port="3">
+
+    <RevRobotics40HDHexMotor  name="carousel" port="3"/>
+
+    <RevRobotics40HDHexMotor  name="intakeR" port="2"/>
+
+    <RevRobotics40HDHexMotor  name="intakeL" port="1"/>
+
+        <RevRobotics40HDHexMotor  name="extender" port="0"/>
+
+        <RevTouchSensor name="tsL" port="1"/>
+
+
+        <Servo name="basket" port="0"/>
+
+        <ContinuousRotationServo name="turnEx" port="1"/>
+
+        <REV_VL53L0X_RANGE_SENSOR name="dst" port="0" bus="3"/>
+
+
+        <REV_VL53L0X_RANGE_SENSOR name="dsBR" port="0" bus="2"/>
+
+
+</LynxModule>
+
+
+    <LynxModule name="Control Hub" port="173">
+
+    <NeveRest40Gearmotor name="fr" port="0"/>
+
+    <NeveRest40Gearmotor name="fl" port="1"/>
+
+    <NeveRest40Gearmotor name="bl" port="2"/>
+
+    <NeveRest40Gearmotor name="br" port="3"/>
+
+    <LynxEmbeddedIMU name="imu" port="0" bus="0"/>
+
+    <REV_VL53L0X_RANGE_SENSOR name="ds" port="0" bus="1"/>
+
+    <REV_VL53L0X_RANGE_SENSOR name="ds2" port="0" bus="2"/>
+
+        <RevTouchSensor name="tsR" port="1"/>
+
+
+</LynxModule>
+
+</LynxUsbDevice>
+
+</Robot>

@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -22,7 +24,9 @@ public class HwMapLinearState extends LinearOpMode {
 
     public DcMotor fl, fr, br, bl, carouselSpinner, intakeL, intakeR, extender;
     public DistanceSensor dsL, dsR, dsBR;
-    public Servo basket, turnExtender;
+    public Servo basket;
+    public CRServo turnExtender;
+    public TouchSensor tsL, tsR;
 
     public int rotations = 0;
     public BNO055IMU imu;
@@ -48,8 +52,10 @@ public class HwMapLinearState extends LinearOpMode {
         dsR = hardwareMap.get(DistanceSensor.class, "ds2"); //right
         dsBR = hardwareMap.get(DistanceSensor.class, "dsBR");
         basket = hardwareMap.servo.get("basket");
-        turnExtender = hardwareMap.servo.get("turn");
+        turnExtender = hardwareMap.get(CRServo.class,"turnEx");
         extender = hardwareMap.dcMotor.get("extender");
+        tsL = hardwareMap.touchSensor.get("tsL");
+        tsR = hardwareMap.touchSensor.get("tsR");
 
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -305,12 +311,6 @@ public class HwMapLinearState extends LinearOpMode {
     }
 
     /**
-     * Increment the servo position of the servo instead of going from point a to b in one swing
-     * @param position from 0.0 to 1.0
-     * @param timeout in seconds; force quits the method if the servo is still trying to move after a certain amount of time
-     */
-
-    /**
      * The process of using the motor object's run-to-position call and then idle so the motor is the only hardware running
      * @param motor from any in the hardware map
      * @param counts position in encoder counts
@@ -348,9 +348,14 @@ public class HwMapLinearState extends LinearOpMode {
     public void deliverBox()
     {
         int extendCts = 8230, multiplier = 1;
-        double boxDeliverDistance = 0, turnExtenderPosition = 0.5;
+        double boxDeliverDistance = 0;
 
-        turnExtender.setPosition(turnExtenderPosition); //turn the extender out of the way of the wheels
+        runtime.reset();
+        while (opModeIsActive() && runtime.time() < 1 && !tsL.isPressed() && !tsR.isPressed())
+        { //turn the extender out of the way
+            turnExtender.setPower(1);
+        }
+
         motorRTPIdle(extender, extendCts, 1); // extender to tower
         basket.setPosition(.7); //open basket to release piece
         waitFor(.75);
