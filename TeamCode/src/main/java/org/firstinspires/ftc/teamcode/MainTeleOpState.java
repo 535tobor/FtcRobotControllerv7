@@ -85,13 +85,13 @@ public class MainTeleOpState extends HwMapIterState{
         else if(gamepad2.a&&distanceThreshold(4,9))
         {
             turnPower = (dsTurn.getDistance(DistanceUnit.CM)-4)/10;
-            turnPower = Math.max(0.03, turnPower);
+            if(turnPower<.06) { turnPower = 0; }
             turnExtender.setPower(turnPower);//positive
         }
         else if(gamepad2.a&&distanceThreshold(17,22))
         {
             turnPower = (22-dsTurn.getDistance(DistanceUnit.CM))/10;
-            turnPower = Math.max(0.03, turnPower);
+            if(turnPower<.06) { turnPower = 0; }
             turnExtender.setPower(turnPower);//positive
         }
 
