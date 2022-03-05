@@ -66,30 +66,30 @@ public class MainTeleOpState extends HwMapIterState{
 
         //  controller two... arm/claw/carouspinner
 
-        if(gamepad2.left_bumper) {
+        if(gamepad2.dpad_left) {
             carouSpin.setPower(.42);
         } //carousel spinner left
-        else if(gamepad2.right_bumper) {
+        else if(gamepad2.dpad_right) {
             carouSpin.setPower(-.42);
         } // carousel spinner right
         else{
             carouSpin.setPower(0);
         }
+        // also this
 
-        if(gamepad2.dpad_right) {  basket.setPosition(.2); }
-        else if(gamepad2.dpad_up) { basket.setPosition(.4); }
-        else if(gamepad2.dpad_left) { basket.setPosition(.7); }
-
-
-        if(gamepad2.b&&distanceThreshold(9,17)) { turnExtender.setPower(1); }// change threshold to handle overshooting; clockwise to the left
-        else if(gamepad2.a&&distanceThreshold(9,17)) { turnExtender.setPower(-1); }//counterclockwise to the right
-        else if(gamepad2.a&&distanceThreshold(4,9))
+        if(gamepad2.right_bumper) {  basket.setPosition(.3); }
+        else if(gamepad2.left_bumper) { basket.setPosition(0); }
+        else  {basket.setPosition(.15); }
+        // Change because it wont work
+        if((gamepad2.right_stick_x < 0)&&distanceThreshold(9,17)) { turnExtender.setPower(1); }// change threshold to handle overshooting; clockwise to the left
+        else if((gamepad2.right_stick_x > 0)&&distanceThreshold(9,17)) { turnExtender.setPower(-1); }//counterclockwise to the right
+        else if((gamepad2.right_stick_x < 0)&&distanceThreshold(4,9))
         {
             turnPower = (dsTurn.getDistance(DistanceUnit.CM)-4)/10;
             if(turnPower<.06) { turnPower = 0; }
             turnExtender.setPower(turnPower);//positive
         }
-        else if(gamepad2.b&&distanceThreshold(17,22))
+        else if((gamepad2.right_stick_x > 0)&&distanceThreshold(17,22))
         {
             turnPower = (22-dsTurn.getDistance(DistanceUnit.CM))/10;
             if(turnPower<.06) { turnPower = 0; }
@@ -98,14 +98,14 @@ public class MainTeleOpState extends HwMapIterState{
 
         extender.setPower(gamepad2.left_stick_y);
 
-        if(gamepad2.x&&intakeCanToggle) {
+        if((gamepad2.right_trigger > .1)&&intakeCanToggle) {
             intakeCanToggle=false;
             if(intakeToggle) { launchSetZero(); intakeToggle=false; }
             else{ launch(); intakeToggle=true; }
         }
         else { intakeCanToggle=true; }
 
-        if( gamepad2.y&& reverseIntakeCanToggle)
+        if((gamepad2.left_trigger > .1)&& reverseIntakeCanToggle)
         {
             reverseIntakeCanToggle=false;
             if(reverseIntakeToggle){ launchSetZero(); reverseIntakeToggle=false; }
@@ -154,7 +154,7 @@ public class MainTeleOpState extends HwMapIterState{
 
 
 
-        telemetry.addData("distance: ", dsBR.getDistance(DistanceUnit.CM));
+        telemetry.addData("distance: ", dsTurn.getDistance(DistanceUnit.CM));
         telemetry.update();
 
     }

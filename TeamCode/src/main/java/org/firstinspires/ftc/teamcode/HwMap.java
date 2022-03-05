@@ -84,6 +84,7 @@ public class HwMap extends LinearOpMode {
      */
     public void spin(double time, double power)
     {
+
         runtime.reset();
         while (opModeIsActive()&& runtime.time() < time){
             carouSpin.setPower(power);
