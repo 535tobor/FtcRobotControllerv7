@@ -88,11 +88,11 @@ public class MainTeleOpState extends HwMapIterState{
             if(turnPower<.06) { turnPower = 0; }
             turnExtender.setPower(turnPower);//positive
         }
-        else if(gamepad2.a&&distanceThreshold(17,22))
+        else if(gamepad2.b&&distanceThreshold(17,22))
         {
             turnPower = (22-dsTurn.getDistance(DistanceUnit.CM))/10;
             if(turnPower<.06) { turnPower = 0; }
-            turnExtender.setPower(turnPower);//positive
+            turnExtender.setPower(-turnPower);//negative
         }
 
         extender.setPower(gamepad2.left_stick_y);
