@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class MainTeleOpState extends HwMapIterState{
     boolean intakeCanToggle = true, intakeToggle = false, reverseIntakeCanToggle = true, reverseIntakeToggle = false;
     boolean basketCanToggle = true, basketToggle = false, distanceThreshold = false;
-
+    double turnPower = 1;
     ElapsedTime timer = new ElapsedTime();
     public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     @Override
@@ -79,9 +79,21 @@ public class MainTeleOpState extends HwMapIterState{
         else if(gamepad2.dpad_up) { basket.setPosition(.4); }
         else if(gamepad2.dpad_left) { basket.setPosition(.7); }
 
-        if(gamepad2.b&&distanceThreshold(4,22)) { turnExtender.setPower(1); }// change threshold to handle overshooting; clockwise
-        else if(gamepad2.a&&distanceThreshold(4,22)) { turnExtender.setPower(-1); }//counterclockwise
-        else { turnExtender.setPower(0); }
+
+        if(gamepad2.b&&distanceThreshold(9,17)) { turnExtender.setPower(1); }// change threshold to handle overshooting; clockwise to the left
+        else if(gamepad2.a&&distanceThreshold(9,17)) { turnExtender.setPower(-1); }//counterclockwise to the right
+        else if(gamepad2.a&&distanceThreshold(4,9))
+        {
+            turnPower = (dsTurn.getDistance(DistanceUnit.CM)-4)/10;
+            turnPower = Math.max(0.03, turnPower);
+            turnExtender.setPower(turnPower);//positive
+        }
+        else if(gamepad2.a&&distanceThreshold(17,22))
+        {
+            turnPower = (22-dsTurn.getDistance(DistanceUnit.CM))/10;
+            turnPower = Math.max(0.03, turnPower);
+            turnExtender.setPower(turnPower);//positive
+        }
 
         extender.setPower(gamepad2.left_stick_y);
 
@@ -101,7 +113,6 @@ public class MainTeleOpState extends HwMapIterState{
         else { reverseIntakeCanToggle = true; }
 
         telemetry.addData("distance: ", dsBR.getDistance(DistanceUnit.CM));
-
         telemetry.update();
 
     }
@@ -111,34 +122,8 @@ public class MainTeleOpState extends HwMapIterState{
 
     }
 
-
     public boolean distanceThreshold(double distanceLBound, double distanceRBound)
     {
         return(dsTurn.getDistance(DistanceUnit.CM)>distanceLBound&&dsTurn.getDistance(DistanceUnit.CM)<distanceRBound);
     }
-
-//    public boolean timeBoolControl = false;
-//    public double initTime = 0;
-//    public ArrayList<Boolean> timeControls = new ArrayList<>();
-//    public void timerMotorPow(boolean gamepad, double desiredTime, DcMotor motor, double power)
-//    {
-//        if(!timeBoolControl)
-//        {
-//            timeBoolControl = gamepad;
-//            initTime = getRuntime();
-//        }
-//        else
-//        {
-//            if(getRuntime()<initTime+desiredTime)
-//            {
-//                motor.setPower(power);
-//            }
-//            else
-//            {
-//                extender.setPower(0);
-//                timeBoolControl = false;
-//            }
-//
-//        }
-//    }
 }
