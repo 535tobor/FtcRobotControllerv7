@@ -10,7 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class MainTeleOpState extends HwMapIterState{
     boolean intakeCanToggle = true, intakeToggle = false, reverseIntakeCanToggle = true, reverseIntakeToggle = false;
     boolean basketCanToggle = true, basketToggle = false, distanceThreshold = false;
-    double turnPower = 1;
+    double turnPower = 1, initTime = 0;
+    boolean startAutoMov = false;
     ElapsedTime timer = new ElapsedTime();
     public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     @Override
@@ -111,6 +112,28 @@ public class MainTeleOpState extends HwMapIterState{
             else{ reverseLaunch();  reverseIntakeToggle=true; }
         }
         else { reverseIntakeCanToggle = true; }
+
+
+        if(!startAutoMov)
+        {
+            startAutoMov = gamepad2.right_stick_button;
+            initTime = getRuntime();
+        }
+        else
+        {
+            if(getRuntime()<initTime+3)
+            {
+                extender.setPower(.3);
+            }
+            else
+            {
+                extender.setPower(0);
+                startAutoMov = false;
+            }
+
+        }
+
+
 
         telemetry.addData("distance: ", dsBR.getDistance(DistanceUnit.CM));
         telemetry.update();
