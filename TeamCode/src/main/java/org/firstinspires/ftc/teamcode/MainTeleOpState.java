@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class MainTeleOpState extends HwMapIterState{
     boolean intakeCanToggle = true, intakeToggle = false, reverseIntakeCanToggle = true, reverseIntakeToggle = false;
     boolean basketCanToggle = true, basketToggle = false, distanceThreshold = false;
-    double turnPower = 1, initTime = 0;
-    boolean startAutoMov = false;
+    double turnPower = 1, initTime = 0, initTimeR = 0;
+    boolean startBasketLOpen = false, startBasketROpen = false;
     ElapsedTime timer = new ElapsedTime();
     public final double WHEEL_DIAMETER = 5.65, COUNTS_PER_INCH = 1120/(WHEEL_DIAMETER * 3.14);
     @Override
@@ -123,21 +123,40 @@ public class MainTeleOpState extends HwMapIterState{
         else { reverseIntakeCanToggle = true; }
 
 
-        if(!startAutoMov)
+        if(!startBasketLOpen)
         {
-            startAutoMov = gamepad2.right_stick_button;
-            initTime = getRuntime();
+            startBasketLOpen = gamepad2.left_bumper;
+            initTime = getRuntime(); // the time at which the movement starts
         }
-        else
+        else // auto movement has started
         {
-            if(getRuntime()<initTime+3)
+            if(getRuntime()<initTime+1)//checking if the correct amount of time has passed since movement has started
             {
-                extender.setPower(.3);
+                basket.setPosition(.3);
             }
             else
             {
-                extender.setPower(0);
-                startAutoMov = false;
+                basket.setPosition(.15);
+                startBasketLOpen = false;
+            }
+
+        }
+
+        if(!startBasketROpen)
+        {
+            startBasketROpen = gamepad2.right_bumper;
+            initTimeR = getRuntime(); // the time at which the movement starts
+        }
+        else // auto movement has started
+        {
+            if(getRuntime()<initTimeR+1)//checking if the correct amount of time has passed since movement has started
+            {
+                basket.setPosition(0);
+            }
+            else
+            {
+                basket.setPosition(.15);
+                startBasketROpen = false;
             }
 
         }
