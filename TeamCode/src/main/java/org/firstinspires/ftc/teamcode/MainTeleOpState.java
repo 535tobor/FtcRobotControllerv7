@@ -61,11 +61,16 @@ public class MainTeleOpState extends HwMapIterState{
 
             setPowerZero();
         }
-
+    if(gamepad2.a){
+        basket.setPosition((basket.getPosition()) + .001);
+    }
+    else if(gamepad2.b){
+        basket.setPosition((basket.getPosition()) - .001);
+    }
     //robot.game(win);
 
         //  controller two... arm/claw/carouspinner
-
+    // CAROUSEL SPINNER
         if(gamepad2.dpad_left) {
             carouSpin.setPower(.42);
         } //carousel spinner left
@@ -75,15 +80,15 @@ public class MainTeleOpState extends HwMapIterState{
         else{
             carouSpin.setPower(0);
         }
-        // also this
-
+    // BUCKET CONTROL
         if(gamepad2.right_bumper) {  basket.setPosition(.3); }
         else if(gamepad2.left_bumper) { basket.setPosition(0); }
         else  {basket.setPosition(.15); }
-        // Change because it wont work
+    // TURN EXTENDER
+        /**
         if((gamepad2.right_stick_x < 0)&&distanceThreshold(9,17)) { turnExtender.setPower(1); }// change threshold to handle overshooting; clockwise to the left
         else if((gamepad2.right_stick_x > 0)&&distanceThreshold(9,17)) { turnExtender.setPower(-1); }//counterclockwise to the right
-        else if((gamepad2.right_stick_x < 0)&&distanceThreshold(4,9))
+        else if((gamepad2.right_stick_x == 0)&&distanceThreshold(4,9))
         {
             turnPower = (dsTurn.getDistance(DistanceUnit.CM)-4)/10;
             if(turnPower<.06) { turnPower = 0; }
@@ -95,9 +100,13 @@ public class MainTeleOpState extends HwMapIterState{
             if(turnPower<.06) { turnPower = 0; }
             turnExtender.setPower(-turnPower);//negative
         }
-
+         **/
+        if(gamepad2.right_stick_x < 0) {turnExtender.setPower(.8);}
+        else if (gamepad2.right_stick_x > 0) {turnExtender.setPower(-.8);}
+        else {turnExtender.setPower(0);};
+    // EXTENDER
         extender.setPower(gamepad2.left_stick_y);
-
+    // BLOCK INTAKE/OUTAKE
         if((gamepad2.right_trigger > .1)&&intakeCanToggle) {
             intakeCanToggle=false;
             if(intakeToggle) { launchSetZero(); intakeToggle=false; }
