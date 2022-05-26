@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.leaguechamp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name="Red/Blue Depot")
+@Autonomous(name="Blue Warehouse")
 @Disabled
-public class RedDepot extends HwMap {
+public class BlueWarehouse extends HwMap {
 
 
     @Override
@@ -21,6 +21,9 @@ public class RedDepot extends HwMap {
         if(opModeIsActive()) //run
         {
             //extend.setPower(.4);
+
+            driveByTime(-.6,.5);
+            robotTurn(-90, 5);
             driveByTime(.6,2);
         }
     }

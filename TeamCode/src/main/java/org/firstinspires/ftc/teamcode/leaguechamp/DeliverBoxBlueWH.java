@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.leaguechamp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "DeliverBlueWarehouse")
-//@Disabled
-public class DeliverBoxBlueWH extends  HwMap{
+@Disabled
+public class DeliverBoxBlueWH extends HwMap {
     @Override
     public void runOpMode()
     {

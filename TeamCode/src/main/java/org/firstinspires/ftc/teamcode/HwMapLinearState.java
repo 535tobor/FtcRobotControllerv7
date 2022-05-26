@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class HwMapLinearState extends LinearOpMode {
 
     public DcMotor fl, fr, br, bl, carouselSpinner, intakeL, intakeR, extender;
-    public DistanceSensor dsL, dsR, dsBR;
+    public DistanceSensor dsBR;
     public Servo basket;
     public CRServo turnExtender;
     public TouchSensor tsL, tsR;
@@ -48,8 +48,6 @@ public class HwMapLinearState extends LinearOpMode {
         fl.setDirection(DcMotor.Direction.REVERSE);
         bl.setDirection(DcMotor.Direction.REVERSE);
         carouselSpinner = hardwareMap.dcMotor.get("carousel");
-        dsL = hardwareMap.get(DistanceSensor.class, "ds"); //left
-        dsR = hardwareMap.get(DistanceSensor.class, "ds2"); //right
         dsBR = hardwareMap.get(DistanceSensor.class, "dsBR");
         basket = hardwareMap.servo.get("basket");
         turnExtender = hardwareMap.get(CRServo.class,"turnEx");
@@ -186,18 +184,18 @@ public class HwMapLinearState extends LinearOpMode {
         setPowerZero();
     }
 
-    public void robotTurnToAngle(int degrees, double timeoutS)
+    public void robotTurnToAngle(int degrees, double timeoutS, double multiplierR, double multiplierL)
     {
         double power = .06;
-        int multiplierL = 1, multiplierR = -1;
+        multiplierR *= -1;
         double divisor = degrees - getRobotAngle(); //desired - initial
         if(getRobotAngle()>degrees)
         {
-            multiplierL = -1;
-            multiplierR = 1;
+            multiplierL *=-1;
+            multiplierR*=-1;
         }
         runtime.reset();
-        while(opModeIsActive()&&threshold(getRobotAngle(), degrees, 2) && Math.abs(power)>.055&&(runtime.time()<timeoutS));
+        while(opModeIsActive()&&threshold(getRobotAngle(), degrees, 2) && Math.abs(power)>.055&&(runtime.time()<timeoutS))
         {
             updateGyro();
             power = (getRobotAngle()-degrees)/divisor; // (current - desired) / desired - initial
@@ -227,7 +225,7 @@ public class HwMapLinearState extends LinearOpMode {
         while ( opModeIsActive() && (runtime.seconds() < timeoutS) && (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2
                 < newLeftTarget  &&Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget))
         {
-            double rem = (Math.abs(fl.getCurrentPosition())+ Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
+            double rem = (double)(Math.abs(fl.getCurrentPosition())+ Math.abs(bl.getCurrentPosition())+Math.abs(fr.getCurrentPosition()) + Math.abs(br.getCurrentPosition()))/4;
             double NLspeed, NRspeed;
             boolean tele = (Math.abs(fl.getCurrentPosition() + bl.getCurrentPosition()) /2 < newLeftTarget  && Math.abs(fr.getCurrentPosition() + br.getCurrentPosition())/2 < newRightTarget);
             telemetry.update();

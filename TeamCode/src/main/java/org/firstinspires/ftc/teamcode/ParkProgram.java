@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="Park")
 //@Disabled
-public class ParkProgram extends HwMap {
+public class ParkProgram extends HwMapLinearState {
 
 
     @Override
@@ -19,8 +19,8 @@ public class ParkProgram extends HwMap {
         }
         if(opModeIsActive()) //run
         {
-            pincerGrip();
-            driveByTime(.7, 3);
+            //pincerGrip();
+            driveByTime(.7, 1);
             //turn(90, 5);
             //driveByTime(.5, 1.5);
         }

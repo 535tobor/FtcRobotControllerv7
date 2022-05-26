@@ -1,16 +1,17 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.leaguechamp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "DeliverRedDepot")
-//@Disabled
-public class DeliverBoxRedDepot extends  HwMap{
+@Autonomous(name = "DeliverRedWarehouse")
+@Disabled
+public class DeliverBoxRedWH extends HwMap {
     ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode()
     {
-        side = "left";
+        side = "right";
         initHwMap();
         while(!isStarted()&&!isStopRequested())
         {
@@ -26,7 +27,7 @@ public class DeliverBoxRedDepot extends  HwMap{
         }
         if(opModeIsActive())
         {
-            waitFor(5);
+
             deliverBox();
         }
     }

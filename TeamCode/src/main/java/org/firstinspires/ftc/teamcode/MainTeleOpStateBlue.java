@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name = "MainTeleState")
+@TeleOp(name = "MainTeleStateBlue")
 
-public class MainTeleOpState extends HwMapIterState{
+public class MainTeleOpStateBlue extends HwMapIterState{
     boolean intakeCanToggle = true, intakeToggle = false, reverseIntakeCanToggle = true, reverseIntakeToggle = false;
     boolean basketCanToggle = true, basketToggle = false, distanceThreshold = false;
     double turnPower = 1, initTime = 0, initTimeR;
@@ -25,6 +26,7 @@ public class MainTeleOpState extends HwMapIterState{
     {
         initHwMap();
         updateGyro();
+        extender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     @Override
     public void init_loop()
@@ -82,11 +84,15 @@ public class MainTeleOpState extends HwMapIterState{
             carouSpin.setPower(0);
         }
     // TURN EXTENDER
-        if(gamepad2.right_stick_x > 0) {turnExtender.setPower(.8);}
-        else if (gamepad2.right_stick_x < 0) {turnExtender.setPower(-.8);}
+        if(gamepad2.right_stick_x > 0) {turnExtender.setPower(-.8);}
+        else if (gamepad2.right_stick_x < 0) {turnExtender.setPower(.8);}
         else if(!startLTurn&&!startRTurn){turnExtender.setPower(0);}
     // EXTENDER
         if(!startArmExtend) { extender.setPower(gamepad2.left_stick_y);}
+        if(extender.getPower()==0)
+        {
+            extender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
     // BLOCK INTAKE/OUTAKE
         if(gamepad2.right_trigger > .01)
         {
@@ -102,7 +108,7 @@ public class MainTeleOpState extends HwMapIterState{
         }
         if(!startBasketLOpen)
         {
-            startBasketLOpen = gamepad2.left_bumper;
+            startBasketLOpen = gamepad2.right_bumper;
             initTime = getRuntime(); // the time at which the movement starts
         }
         else // auto movement has started
@@ -122,7 +128,7 @@ public class MainTeleOpState extends HwMapIterState{
 
         if(!startBasketROpen)
         {
-            startBasketROpen = gamepad2.right_bumper;
+            startBasketROpen = gamepad2.left_bumper;
             initTimeR = getRuntime(); // the time at which the movement starts
         }
         else // auto movement has started
@@ -139,7 +145,7 @@ public class MainTeleOpState extends HwMapIterState{
 
         }
         telemetry.addData("distance: ", dsTurn.getDistance(DistanceUnit.CM));
-
+        telemetry.addData("power: ", turnExtender.getPower());
         telemetry.addData("encoder: ", extender.getCurrentPosition());
         telemetry.addData("encoder boolean: ", extendThreshold);
         telemetry.update();

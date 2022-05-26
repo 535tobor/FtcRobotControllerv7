@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.leaguechamp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "Auto Cases")
 @Disabled
-public class AutoCases extends HwMap{
+public class AutoCases extends HwMap {
     int encoderCountsToCarousel;
     int carouselDeg = -45, parkDeg = -90;
     boolean selectionButtonPressed = false, buttonPressed = false, isCarousel = false, isReady = false;

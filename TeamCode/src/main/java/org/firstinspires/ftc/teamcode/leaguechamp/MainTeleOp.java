@@ -1,11 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.leaguechamp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "MainTele")
-
-public class MainTeleOp extends HwMapIter{
+@Disabled
+public class MainTeleOp extends HwMapIter {
     boolean armRangeIsValid = false, extendRangeIsValid, buttonPressed=false, toggle = false;
     double curPincerPos = 0, currentAngle = 0;
     int curArmPos, currentEncoder;

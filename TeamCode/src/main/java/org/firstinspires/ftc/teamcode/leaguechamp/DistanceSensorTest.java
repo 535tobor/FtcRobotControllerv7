@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.leaguechamp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous(name = "DS")
 @Disabled
-public class DistanceSensorTest extends HwMap{
+public class DistanceSensorTest extends HwMap {
     ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode()

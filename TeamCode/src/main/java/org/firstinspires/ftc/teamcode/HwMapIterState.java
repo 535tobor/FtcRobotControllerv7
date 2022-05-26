@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Disabled
+//@Disabled
 public class HwMapIterState extends OpMode {
     @Override
     public void init() {
@@ -22,7 +21,7 @@ public class HwMapIterState extends OpMode {
     public DcMotor fl, fr, br, bl, carouSpin, extender, intakeL, intakeR;
     public Servo basket;
     public CRServo turnExtender;
-    public DistanceSensor dsL, dsR, dsBR, dsTurn;
+    public DistanceSensor dsBR, dsTurn;
 
     public int rotations = 0;
 
@@ -45,9 +44,7 @@ public class HwMapIterState extends OpMode {
         basket = hardwareMap.servo.get("basket");
         turnExtender = hardwareMap.get(CRServo.class,"turnEx");
 
-        dsL = hardwareMap.get(DistanceSensor.class, "ds");
         dsBR = hardwareMap.get(DistanceSensor.class, "dsBR");
-        dsR = hardwareMap.get(DistanceSensor.class, "ds2");
         dsTurn = hardwareMap.get(DistanceSensor.class, "dst");
 
         //test bot reverse statements
